@@ -1,0 +1,2735 @@
+import tkinter as tk
+from tkinter import ttk
+from PIL import Image
+import os
+from tkinter import filedialog
+from tkmacosx import Button
+import tkinter.scrolledtext as st
+import pickle
+import pygame
+
+
+
+'#from pickle5 import pickle'
+
+'#Variablen definieren'
+root_groesse = '1000x568'
+frame_height = 568
+bilddateien = ['/Users/RZN/PycharmProjects/Maturaarbeit/Versuch_1/Dateien/Input/.DS_Store', '/Users/RZN/PycharmProjects/Maturaarbeit/Versuch_1/Dateien/Input/ETH_studienwoche_anmeldung_reto_zimmermann Kopie.pdf', "/Users/RZN/PycharmProjects/Maturaarbeit/Versuch_1/Dateien/Input/Power point la lionne et l'ourse 02 Kopie.pptx"]
+
+bildnamen = ['.DS_Store', 'ETH_studienwoche_anmeldung_reto_zimmermann Kopie.pdf', "Power point la lionne et l'ourse 02 Kopie.pptx"]
+
+no_picture = 'Es wurde bei "Ordner" kein Ordner mit Bild ausgewählt, bitte ändern'
+#bilddateien = []
+#bildnamen = []
+pfad_input = None
+
+entry_name = None
+start_name = None
+start_bildformat = None
+start_ziel = None
+start_faktor = None
+start_rotation = None
+start_kombi = None
+
+gif_bildformate = None
+pdf_bildformate = None
+png_bildformate = None
+jpg_bildformate = None
+
+hoehe_ziel = None
+breite_ziel = None
+
+hoehe_input = None
+breite_input = None
+
+height_ziel = None
+width_ziel = None
+name_input = None
+
+faktor_input = None
+state_file = True
+state_name = True
+state_art = True
+state_faktor = True
+state_ziel = True
+state_rotation = True
+state_kombi = True
+
+break_name = False
+break_art = False
+break_faktor = False
+break_ziel = False
+break_rotation = False
+break_kombi = False
+
+name_new = None
+
+state2_name = False
+state2_art = False
+state2_ziel = False
+state2_faktor = False
+state2_rotation = False
+
+name_kombi = None
+art_kombi = None
+ziel_kombi = None
+faktor_kombi = None
+rotation_kombi = None
+
+errstate_name = False
+errstate_art = False
+errstate_ziel = False
+errstate_faktor = False
+errstate_rotation = False
+errstate_kombi = False
+
+start_start = False
+
+gegen_rotation = None
+uhrzeiger_rotation = None
+kopf_rotation = None
+
+configur_label = None
+configur_state = 'no'
+
+no_name = []
+no_art = []
+no_ziel = []
+no_faktor = []
+no_rotation = []
+no_kombi = []
+
+chose_kombi = {'name': False, 'art': False, 'ziel': False, 'faktor': False, 'rotation': False}
+
+glob_name = 'hallo_'
+glob_art = '.gif'
+glob_width = 80
+glob_height = None
+glob_faktor = 0.7
+glob_rotation = 'u'
+
+act_name = 'Der Name der Bilder zu "' + glob_name + '"'
+act_art = 'Die Art der Bilder zu "' + glob_art + '"'
+act_ziel = 'Breite der Bilder zu "'
+act_faktor = 'Grösse der Bilder um den Faktor ' + str(glob_faktor)
+act_rotation = 'Bilder rotiert um ' + glob_rotation
+
+
+
+
+
+
+
+
+dicl_set = pickle.load(
+    open('/Users/RZN/PycharmProjects/Maturaarbeit/Versuch_1/Literation_2/setting_ma.pickle', 'rb'))
+output_def = dicl_set['output_dic'] + '/'
+pfad_output = output_def
+input_def = dicl_set['input_dic']
+
+'#color_def = None'
+name_def = dicl_set['name_dic']
+
+#vortschritt_pb = None
+vortschritt_pb = 100/len(bildnamen)
+'#Grundfunktionen implementieren'
+
+pygame.mixer.init()
+
+def function_sucsess():
+    pygame.mixer.music.load('/Users/RZN/Desktop/RG_schule/0_oberstufe/Maturaarbeit/sounds/success.mp3')
+    pygame.mixer.music.play(loops=0)
+
+
+def button_press():
+    pygame.mixer.music.load('/Users/RZN/Desktop/RG_schule/0_oberstufe/Maturaarbeit/sounds/Button_press.mp3')
+    pygame.mixer.music.play(loops=0)
+
+def function_error():
+    '#https://mixkit.co/free-sound-effects/error/'
+    pygame.mixer.music.load('/Users/RZN/Desktop/RG_schule/0_oberstufe/Maturaarbeit/sounds/buzz_error.mp3')
+    pygame.mixer.music.play(loops=0)
+
+
+def destroy_children():
+    for widget in frame_function.winfo_children():
+        widget.destroy()
+
+def color_canvas():
+    canvas_setting['bg'] = 'white'
+    canvas_file['bg'] = 'white'
+    canvas_name['bg'] = 'white'
+    canvas_art['bg'] = 'white'
+    canvas_ziel['bg'] = 'white'
+    canvas_faktor['bg'] = 'white'
+    canvas_rotation['bg'] = 'white'
+    canvas_kombi['bg'] = 'white'
+
+'#einzelne GUIs implemantiern '
+'#systematik: Elemente die zusammengehören, folgen direkt aufeinander,'
+'# sonst gibt es 1.5x die Höhe des Oberen Widget als Abstand'
+
+'#funktioniert'
+
+
+def gui_setting(event):
+
+    def output_set():
+        button_press()
+        global output_def
+        output_def = filedialog.askdirectory(initialdir=output_def)
+        output_label = tk.Label(frame_function, font='arial 16')
+        output_label.place(y=185, relx=0.5, anchor='center')
+        if len(output_def) == 0:
+            output_label['text'] = 'Es wurde kein Ordner ausgewählt'
+        print(output_def, len(output_def))
+
+
+
+    def input_set():
+        button_press()
+        global input_def
+        input_def = filedialog.askdirectory(initialdir=input_def)
+
+    def save_setting():
+        button_press()
+        dic_set = {'output_dic': output_def, 'input_dic': input_def, 'name_dic': name_def}
+        pickle_file = open('setting_ma.pickle', 'wb')
+        pickle.dump(dic_set, pickle_file)
+        pickle_file.close()
+        function_sucsess()
+
+    def standart_setting():
+        button_press()
+        destroy_children()
+        color_canvas()
+        canvas_setting['bg'] = 'light gray'
+
+        titel_setting = tk.Label(frame_function, text='Einstellungen verändern', font='arial 24 bold')
+        titel_setting.place(y=71, relx=0.5, anchor='center')
+        '#width=168, height=36'
+
+        output_setting = tk.Label(frame_function, text='Neuer Speicherort der formatierten Bilder festlegen', font='arial 16')
+        output_setting.place(y=120, relx=0.5, anchor='center')
+        '#width=398, height=26'
+
+        out_button_setting = tk.Button(frame_function, text='Speicherort festlegen', font='arial 16',
+                                       command=lambda: output_set(), pady=1, padx=2)
+        out_button_setting.place(y=146, relx=0.5, anchor='center')
+
+        '#width=90, height=24'
+
+        input_setting = tk.Label(frame_function, text='Neuer Startort festlegen, um den Ordner bei "Order" auszuwählen', font='arial 16')
+        input_setting.place(y=250, relx=0.5, anchor='center')
+        '#width=380, height26'
+
+        inp_button_setting = tk.Button(frame_function, text='Startort bestimmen', font='arial 16',
+                                       command=lambda: input_set(), pady=1, padx=2)
+        inp_button_setting.place(y=276, relx=0.5, anchor='center')
+        '#width=118, height=24'
+
+        speichern_setting = tk.Button(frame_function, text='Einstellungen speichern', font='arial 16',
+                                      command=lambda: save_setting(), pady=1, padx=2)
+        speichern_setting.place(y=325, relx=0.5, anchor='center')
+        '#width=411, height=26'
+
+        reload_setting = tk.Button(frame_function, text='neu laden', font='arial 16', pady=1, padx=2, command=lambda: standart_setting())
+        reload_setting.place(y=544, relx=0.5, anchor='center')
+        '#width=84, height=24'
+
+
+        help_setting = tk.Text(frame_help, font='arial 16')
+        help_setting.place(x=0, y=0, width=299, height=467)
+
+        help_setting.tag_configure('left', justify='left')
+
+        help_setting.insert(tk.END, 'Hilfefenster Einstellungen\n\n', 'center')
+        help_setting.insert(tk.END, 'Erläuterungen zu Einstellungen \n\n'
+                                    '(nichts?)\n\n'
+                                    ' Kurze generelle Erklärung zum Programm. \n'
+                                    'Dieses Programm ist im Rahmen einer Maturaarbeit\n'
+                                    ' im Jahre 2022 entstanden. Es ermöglicht Bildformatierungen\n'
+                                    ' in der Stapelverarbeitung. (logisch und simpel GUI?) \n\n'
+                                    'Zwei Hinweise:\n '
+                                    '-  JPEGs sollten, wenn möglich nicht formatiert werden.\n'
+                                    ' Denn bei diese büssen bei jeder Formatierung an Qualität ein. \n'
+                                    '- Bei jeder Formatierung werden die Metadaten gelöscht. \n\n'
+                                    'Möge sich dieses Programm als nützlich erweisen', 'left')
+
+        help_setting.config(state='disabled')
+
+    standart_setting()
+
+
+'#funktioniert'
+
+
+def gui_file(event):
+    global state_file, start_start
+
+    def info_file(pfad_input, restart=None, press=False):
+        global state_file, vortschritt_pb
+
+        def default_glob():
+            global entry_name, start_name, start_bildformat, start_ziel, start_faktor, \
+                start_rotation, start_kombi, gif_bildformate, pdf_bildformate, \
+                png_bildformate, jpg_bildformate, hoehe_ziel, breite_ziel, hoehe_input, \
+                breite_input, height_ziel, width_ziel, name_input, faktor_input, state_file, \
+                state_name, state_art, state_faktor, state_ziel, state_rotation, state_kombi,\
+                break_name, break_art, break_faktor, break_ziel, break_rotation, break_kombi,\
+                name_new, state2_name, state2_art, state2_ziel, state2_faktor,\
+                state2_rotation, errstate_name, errstate_art, errstate_ziel, errstate_faktor,\
+                errstate_rotation, errstate_kombi, no_name, no_art, no_ziel, no_faktor,\
+                no_rotation, no_kombi, chose_kombi
+
+            button_press()
+
+            entry_name = None
+            start_name = None
+            start_bildformat = None
+            start_ziel = None
+            start_faktor = None
+            start_rotation = None
+            start_kombi = None
+
+            gif_bildformate = None
+            pdf_bildformate = None
+            png_bildformate = None
+            jpg_bildformate = None
+
+            hoehe_ziel = None
+            breite_ziel = None
+
+            hoehe_input = None
+            breite_input = None
+
+            height_ziel = None
+            width_ziel = None
+            name_input = None
+
+            faktor_input = None
+            state_name = True
+            state_art = True
+            state_faktor = True
+            state_ziel = True
+            state_rotation = True
+            state_kombi = True
+
+            break_name = False
+            break_art = False
+            break_faktor = False
+            break_ziel = False
+            break_rotation = False
+            break_kombi = False
+
+            name_new = None
+
+            state2_name = False
+            state2_art = False
+            state2_ziel = False
+            state2_faktor = False
+            state2_rotation = False
+
+            errstate_name = False
+            errstate_art = False
+            errstate_ziel = False
+            errstate_faktor = False
+            errstate_rotation = False
+            errstate_kombi = False
+
+            no_name = []
+            no_art = []
+            no_ziel = []
+            no_faktor = []
+            no_rotation = []
+            no_kombi = []
+
+            chose_kombi = {'name': False, 'art': False, 'ziel': False, 'faktor': False, 'rotation': False}
+
+        state_file = False
+        nim = []
+
+        if restart == 'restart':
+            default_glob()
+        if len(pfad_input) == 0:
+            if press != False:
+                function_error()
+            output_file = tk.Label(frame_function, text='Bitte einen Ordner auswählen', font='arial 16', fg='red')
+            output_file.place(y=182, relx=0.5, anchor='center')
+            '#width=306, height=26'
+
+
+
+        else:
+            #function_sucsess()
+
+            output_file = tk.Label(frame_function, text='Folgender Ordner ist ausgewählt: ', font='arial 16', fg='lime')
+            output_file.place(y=182, relx=0.5, anchor='center')
+            '#width=306, height=26'
+            auswahl_file = tk.Label(frame_function, text=pfad_input.rsplit('/', -1)[-1], font='arial 16', fg='lime')
+            auswahl_file.place(y=208, relx=0.5, anchor='center')
+            pfad_input += '/'
+            for file in os.listdir(pfad_input):
+                try:
+                    path_new = pfad_input + file
+
+                    Image.open(path_new)
+                except:
+                    nim.append(file)
+                else:
+                    bilddateien.append(path_new)
+                    bildnamen.append(file)
+
+
+
+            liste = []
+            for element in nim:
+                liste.append(pfad_input+element)
+
+            if len(bildnamen) == 0:
+                output_file.destroy()
+                auswahl_file.destroy()
+                output_file = tk.Label(frame_function, text='Bitte einen Ordner mit Bild auswählen', font='arial 16', fg='red')
+                output_file.place(y=182, relx=0.5, anchor='center')
+                if press != False:
+                    function_error()
+
+            else:
+                if press != False:
+                    function_sucsess()
+
+                if len(nim) == 1:
+                    error_file = tk.Label(frame_function, text='Diese Datei im Ordner kann nicht formatiert werden', font='arial 16')
+                    error_file.place(y=247, relx=0.5, anchor='center')
+                    '#width=597, height26'
+                    error2_file = tk.Label(frame_function, text=nim)
+                    error2_file.place(y=260, x=0)
+                elif len(nim) > 1:
+                    error_file = tk.Label(frame_function, text='Diese Dateien im Ordner können nicht formatiert werden', font='arial 16')
+                    error_file.place(y=247, relx=0.5, anchor='center')
+                    '#width=597, height26'
+                    scrolledtext_file = st.ScrolledText(frame_function, font='arial 16', width=50, height=2.5, bg='#F1F1F1')
+                    scrolledtext_file.place(y=260, x=((600 - 458) / 2))
+                    '#width=458, height=82'
+
+                    for element in nim:
+                        scrolledtext_file.insert(tk.INSERT, '- ' + element + '\n')
+
+                    scrolledtext_file.configure(state='disabled')
+
+                vortschritt_pb = 100 / len(bildnamen)
+
+
+
+
+
+
+    def chose_file():
+        global pfad_input, bilddateien, bildnamen
+        button_press()
+        bilddateien = []
+        bildnamen = []
+        pfad_input = filedialog.askdirectory(initialdir=input_def)
+        standart_file()
+        info_file(pfad_input, restart='restart', press=True)
+
+    def standart_file():
+        global state_file, start_start
+        if start_start == False:
+            start_start = True
+            pass
+        elif start_start == True:
+            button_press()
+        destroy_children()
+
+        color_canvas()
+        canvas_file['bg'] = 'light gray'
+
+        state_file = True
+
+
+        titel_file = tk.Label(frame_function, text='Ordner auswählen', font='arial 24 bold')
+        titel_file.place(y=71, relx=0.5, anchor='center')
+        '#width=97, height=36'
+
+        text_file = tk.Label(frame_function, text='Ordner auswählen mit dem Bild, welches zu formatieren ist', font='arial 16')
+        text_file.place(y=120, relx=0.5, anchor='center')
+        '#width=501, height=26'
+
+        button_file = tk.Button(frame_function, text='Ordner wählen', font='arial 16', command=lambda: chose_file(),
+                                cursor='hand', pady=1, padx=2)
+        button_file.place(y=145, relx=0.5, anchor='center')
+        '#width=113, height=24'
+
+        reload_file = tk.Button(frame_function, text='neu laden', font='arial 16', command=lambda: standart_file(),
+                                cursor='hand', pady=1, padx=2)
+        reload_file.place(y=544, relx=0.5, anchor='center')
+        '#width=84, height=24'
+
+        help_file = tk.Text(frame_help, font='arial 16')
+        help_file.place(x=0, y=0, width=299, height=467)
+
+        help_file.tag_configure('left', justify='left')
+
+        help_file.insert(tk.END, 'Erläuterungen zu Ordner\n\n', 'left')
+        help_file.insert(tk.END, 'Bei „Ordner“ wird der Ordner ausgewählt mit den Bildern, welche zu formatieren sind. Dazu den Knopf „Ordner wählen“ drücken. Die verschiedenen Funktionen der Bildformatierung werden erst freigegeben, wenn ein Ordner mit Bildern ausgewählt wurde.   Sollte es ein Problem mit dieser Funktion geben, den Knopf „neu laden“ drücken.', 'left')
+
+        help_file.config(state='disabled')
+
+    if state_file == True:
+        standart_file()
+
+    else:
+        standart_file()
+        info_file(pfad_input)
+
+
+
+
+
+'#funktioniert'
+
+
+def gui_name(event):
+    global state_name, start_name, break_name, chose_kombi
+
+    def info_name(name_new):
+        global state_name, start_name, state2_name
+
+        entry_name.delete(0, 'end')
+        entry_name.insert(0, name_new)
+
+
+        state2_name = True
+        state_name = False
+        if len(name_new) <= 60:
+            output_name = tk.Label(frame_function, text='Der neue Name ist:',
+                                   font='arial 16')
+            output_name.place(y=193, relx=0.5, anchor='center')
+            '#width=367, height=26'
+
+            auswahl_name = tk.Label(frame_function, text=name_new, font='arial 16')
+            auswahl_name.place(y=219, relx=0.5, anchor='center')
+
+
+            start_name = tk.Button(frame_function, text='start', font='arial 16', command=lambda: change_name(name_new),
+                                   cursor='hand', pady=1, padx=2)
+            start_name.place(y=257, relx=0.5, anchor='center')
+            '#width=40, height =24'
+
+        else:
+            output_name = tk.Label(frame_function, text='Der neue Name höchstens 80 Zeichen haben',
+                                   font='arial 16', fg='red')
+            output_name.place(y=193, relx=0.5, anchor='center')
+            '#width=367, height=26'
+
+    def change_name(name):
+        global start_name, break_name, errstate_name, no_name
+        break_name = False
+
+
+        if len(bildnamen) == 0:
+            function_error()
+            start_name.destroy()
+            bildnamen_name = tk.Label(frame_function, text=no_picture, font='arial 16', fg='red')
+            bildnamen_name.place(y=273, relx=0.5, anchor='center')
+
+        else:
+
+
+
+            if name != None:
+                name += '_'
+
+            start_name.destroy()
+
+            def breakf_name():
+                global break_name
+                function_error()
+                break_name = True
+                #button_press()
+
+
+
+
+            progressbar_name = ttk.Progressbar(frame_function, orient='horizontal',
+                                              length=500, mode='determinate')
+            progressbar_name.place(y=245, x=50)
+
+            stop_name = tk.Button(frame_function, text='stopp', command=lambda: breakf_name(), font='arial 16', pady=1, padx=2)
+            stop_name.place(y=274, relx=0.5, anchor='center')
+            frame_function.update()
+
+            if errstate_name == True:
+                pass
+
+            elif errstate_name == False:
+                button_press()
+                no_name = []
+                nummer_name = 0
+                for datei in bilddateien:
+                    progressbar_name['value'] += vortschritt_pb
+                    frame_function.update()
+
+                    if break_name == False:
+                        nummer_name += 1
+                        try:
+                            zahl_name = str(nummer_name)
+                            objecttext, objectending = os.path.splitext(datei)
+                            name_neu = pfad_output + name + zahl_name + objectending
+                            im = Image.open(datei)
+                            im.save(name_neu)
+                        except:
+                            no_name.append(bildnamen[nummer_name-1])
+
+                    else:
+                        break
+
+                if break_name == False:
+                    function_sucsess()
+                else:
+                    function_error()
+
+            errstate_name = True
+
+            progressbar_name.destroy()
+            stop_name.destroy()
+            ende_name = tk.Label(frame_function, font='arial 16')
+
+            if break_name == False:
+
+                ende_name['text'] = 'Die Bildformatierung wurde beendet'
+                ende_name['fg'] = 'lime'
+                ende_name.place(y=257, relx=0.5, anchor='center')
+                frame_function.update()
+                if len(no_name) == 1:
+                    error_name = tk.Label(frame_function, text='Folgendes Bild konnten nicht '
+                                                               'wie gewünscht formatiert werden', font='arial 16')
+                    error_name.place(y=296, relx=0.5, anchro='center')
+                    '#width=572, height26'
+
+                    error2_name = tk.Label(frame_function, text=no_name, font='arial 16')
+                    error2_name.place(y=322, relx=0.5, anchor='center')
+                if len(no_name) > 1:
+                    error_name = tk.Label(frame_function, text='Folgende Bilder konnten nicht wie gewünscht formatiert werden', font='arial 16')
+                    error_name.place(y=296, relx=0.5, anchor='center')
+                    '#width=572, height26'
+
+                    scrolledtext_name = st.ScrolledText(frame_function, font='arial 16', width=50, height=2.5,
+                                                        bg='#F1F1F1')
+                    scrolledtext_name.place(y=309, x=((600 - 458) / 2))
+                    '#width=458, height=82'
+
+                    for element in no_name:
+                        scrolledtext_name.insert(tk.INSERT, '- ' + element + '\n')
+                    scrolledtext_name.configure(state='disabled')
+                frame_function.update()
+
+            elif break_name == True:
+                ende_name['text'] = 'Die Bildformatierung wurde abgebrochen'
+                ende_name['fg'] = 'red'
+                ende_name.place(y=257, relx=0.5, anchor='center')
+            frame_function.update()
+            break_name = False
+
+
+
+
+    def enter_name(event):
+        global entry_name, name_new, glob_name, state2_name, act_name
+        button_press()
+        name_new = str(entry_name.get())
+        standart_name()
+        glob_name = name_new + '_'
+        state2_name = True
+        act_name = 'Der Name der Bilder zu "' + name_new + '"'
+        entry_name.insert(0, name_new)
+        info_name(name_new)
+
+    def standart_name(kombi=True):
+        global entry_name, state_name, glob_name, state2_name, errstate_name
+        button_press()
+        destroy_children()
+
+        color_canvas()
+
+        canvas_name['bg'] = 'light gray'
+
+        errstate_name = False
+        state2_name = False
+        state_name = True
+        glob_name = None
+
+        if kombi == False:
+            chose_kombi['name'] = False
+
+
+        titel_name = tk.Label(frame_function, text='Name ändern', font='arial 24 bold')
+        titel_name.place(y=71, relx=0.5, anchor='center')
+        '#width=76, height=36'
+
+        '#maximale länge =60 Zeichen'
+        text_name = tk.Label(frame_function, text='Neuer Name eingeben', font='arial 16')
+        text_name.place(y=120, relx=0.5, anchor='center')
+        '#width=538, height=26'
+
+        entry_name = tk.Entry(frame_function, cursor='text')
+        entry_name.place(y=133, x=((600 - 192) / 2))
+        entry_name.bind('<Return>', enter_name)
+        entry_name.delete(0)
+        '#width=192, height=30'
+
+        reload_file = tk.Button(frame_function, text='neu laden', font='arial 16', command=lambda: standart_name(False),
+                                cursor='hand', pady=1, padx=2 )
+        reload_file.place(y=544, relx=0.5, anchor='center')
+        '#width=84, height=24'
+
+        help_name = tk.Text(frame_help, font='arial 16')
+        help_name.place(x=0, y=0, width=299, height=467)
+
+        help_name.tag_configure('left', justify='left')
+
+        help_name.insert(tk.END, 'Erläuterungen zu Name\n\n', 'left')
+        help_name.insert(tk.END, 'Die Funktion „Bildformat“ ändert das Dateiformat der Bilder. Zur Auswahl stehen die 4 gebräuchlichsten Dateiformate. Dieses werde durch klicken auf das gewünschte Bildformat ausgewählt.   Sollte es ein Problem mit dieser Funktion geben, den Knopf „neu laden“ drücken.   ', 'left')
+
+        help_name.config(state='disabled')
+
+    if state_name == True:
+        global errstate_name
+        standart_name()
+
+
+    else:
+        errstate_name_temp = errstate_name
+        standart_name()
+        info_name(name_new)
+        if errstate_name_temp == True:
+
+            errstate_name = True
+            change_name(None)
+
+
+
+
+'#funktioniert'
+
+
+def gui_art(event):
+    global state_art
+
+    def info_art(art):
+        global state_art, png_bildformate, gif_bildformate, jpg_bildformate, pdf_bildformate, \
+            start_bildformat, state2_art, glob_art, act_art
+        glob_art = art
+        act_art = 'Die Art der Bilder zu "' + glob_art + '"'
+        state2_art = True
+        button_press()
+        output_bildformat = tk.Label(frame_function, text='Der neue Dateityp ist: ',
+                                     font='arial 16')
+        output_bildformat.place(y=194, relx=0.5, anchor='center')
+        '#width=411, height=26'
+        if art == 'png':
+            png_bildformate.select()
+            state_art = 'png'
+
+
+            auswahl_bildformat = tk.Label(frame_function, text='png', font='arial 16')
+            auswahl_bildformat.place(y=220, relx=0.5, anchor='center')
+
+            start_bildformat = tk.Button(frame_function, text='start', font='arial 16', command=lambda: png_change(),
+                                         cursor='hand', pady=1, padx=2)
+            start_bildformat.place(y=259, relx=0.5, anchor='center')
+            '#width=40, height =24'
+
+        elif art == 'gif':
+            gif_bildformate.select()
+            state_art = 'gif'
+
+            auswahl_bildformat = tk.Label(frame_function, text='gif', font='arial 16')
+            auswahl_bildformat.place(y=220, relx=0.5, anchor='center')
+
+            start_bildformat = tk.Button(frame_function, text='start', font='arial 16', command=lambda: gif_change(),
+                                         cursor='hand', pady=1, padx=2)
+            start_bildformat.place(y=259, relx=0.5, anchor='center')
+            '#width=40, height =24'
+
+
+        elif art == 'jpg':
+            jpg_bildformate.select()
+            state_art = 'jpg'
+
+
+            auswahl_bildformat = tk.Label(frame_function, text='jpg', font='arial 16')
+            auswahl_bildformat.place(y=220, relx=0.5, anchor='center')
+
+            start_bildformat = tk.Button(frame_function, text='start', font='arial 16', command=lambda: jpg_change(),
+                                         cursor='hand', pady=1, padx=2)
+            start_bildformat.place(y=259, relx=0.5, anchor='center')
+            '#width=40, height =24'
+
+        elif art == 'pdf':
+            pdf_bildformate.select()
+            state_art = 'pdf'
+
+
+            auswahl_bildformat = tk.Label(frame_function, text='pdf', font='arial 16')
+            auswahl_bildformat.place(y=220, relx=0.5, anchor='center')
+
+            start_bildformat = tk.Button(frame_function, text='start', font='arial 16', command=lambda: pdf_change(),
+                                         cursor='hand', pady=1, padx=2)
+            start_bildformat.place(y=259, relx=0.5, anchor='center')
+            '#width=40, height =24'
+
+    def png_change():
+        global start_bildformat, break_art, errstate_art, no_art
+
+        start_bildformat.destroy()
+
+        if len(bildnamen) == 0:
+            bildnamen_name = tk.Label(frame_function, text=no_picture, font='arial 16', fg='red')
+            bildnamen_name.place(y=259, relx=0.5, anchor='center')
+            function_error()
+
+        else:
+
+
+
+            zahl = -1
+
+            art_datei = '.png'
+
+
+
+            def breakf_art():
+                global break_art
+                break_art = True
+                function_error()
+                #button_press()
+
+            progressbar_art = ttk.Progressbar(frame_function, orient='horizontal',
+                                               length=500, mode='determinate')
+            progressbar_art.place(y=247, x=50)
+
+            stop_art = tk.Button(frame_function, text='stopp', command=lambda: breakf_art(), font='arial 16', pady=1, padx=2)
+            stop_art.place(y=275, relx=0.5, anchor='center')
+            frame_function.update()
+
+            if errstate_art == True:
+                pass
+
+            elif errstate_art == False:
+                button_press()
+                no_art = []
+                for datei in bildnamen:
+
+                    frame_function.update()
+                    if break_art == False:
+                        progressbar_art['value'] += vortschritt_pb
+                        try:
+                            zahl += 1
+                            pfad_alt = bilddateien[zahl]
+                            objecttext, objectending = os.path.splitext(datei)
+                            objectending = art_datei
+                            pfad_neu = pfad_output + objecttext + objectending
+                            im = Image.open(pfad_alt)
+
+                            im.save(pfad_neu)
+                        except:
+                            no_art.append(datei)
+
+                    elif break_art == True:
+                        break
+
+                if break_art == False:
+                    function_sucsess()
+                else:
+                    function_error()
+
+            errstate_art = True
+            progressbar_art.destroy()
+            stop_art.destroy()
+
+            end_art = tk.Label(frame_function, font='arial 16')
+
+            if break_art == False:
+
+                end_art['text'] = 'Die Bildformatierung wurde beendet'
+                end_art['fg'] = 'lime'
+                end_art.place(y=259, relx=0.5, anchor='center')
+                if len(no_art) == 1:
+                    error_bildformat = tk.Label(frame_function, text='Folgendes Bild konnte nicht'
+                                                                     ' wie gewünscht formatiert werden', font='arial 16')
+                    error_bildformat.place(y=298, relx=0.5, anchor='center')
+                    '#width=604, height26'
+                    error2_bildformat = tk.Label(frame_function, text=no_art, font='arial 16')
+                    error2_bildformat.place(y=324, relx=0.5, anchor='center')
+
+                elif len(no_art) > 1:
+                    error_bildformat = tk.Label(frame_function, text='Folgende Bilder konnten '
+                                                                     'nicht wie gewünscht formatiert werden', font='arial 16')
+                    error_bildformat.place(y=298, relx=0.5, anchor='center')
+                    '#width=604, height26'
+
+                    scrolledtext_bildformat = st.ScrolledText(frame_function, font='arial 16', width=50, height=2.5,
+                                                              bg='#F1F1F1')
+                    scrolledtext_bildformat.place(y=311, x=((600 - 458) / 2))
+                    '#width=458, height=82'
+
+                    for element in no_art:
+                        scrolledtext_bildformat.insert(tk.INSERT, '- ' + element + '\n')
+                    scrolledtext_bildformat.configure(state='disabled')
+            elif break_art == True:
+                end_art['text'] = 'Die Bildformatierung wurde abgebrochen'
+                end_art['fg'] = 'red'
+                end_art.place(y=259, relx=0.5, anchor='center')
+            frame_function.update()
+            break_art = False
+
+    def png():
+        standart_art()
+        info_art('png')
+
+    def gif_change():
+        global start_bildformat, break_art, errstate_art, no_art
+
+        start_bildformat.destroy()
+
+        if len(bildnamen) == 0:
+            bildnamen_name = tk.Label(frame_function, text=no_picture, font='arial 16', fg='red')
+            bildnamen_name.place(y=259, relx=0.5, anchor='center')
+            function_error()
+
+        else:
+
+
+            zahl = -1
+            art_datei = '.gif'
+
+
+
+            def breakf_art():
+                global break_art
+                function_error()
+                break_art = True
+                #button_press()
+
+            progressbar_art = ttk.Progressbar(frame_function, orient='horizontal',
+                                              length=500, mode='determinate')
+            progressbar_art.place(y=247, x=50)
+
+            stop_art = tk.Button(frame_function, text='stopp', command=lambda: breakf_art(), pady=1, padx=2)
+            stop_art.place(y=275, relx=0.5, anchor='center')
+            frame_function.update()
+
+            if errstate_art == True:
+                pass
+
+            elif errstate_art == False:
+                button_press()
+                no_art = []
+                for file in bildnamen:
+                    frame_function.update()
+                    if break_art == False:
+                        progressbar_art['value'] += vortschritt_pb
+                        try:
+                            zahl += 1
+                            pfad_alt = bilddateien[zahl]
+                            objecttext, objectending = os.path.splitext(file)
+                            objectending = art_datei
+                            pfad_neu = pfad_output + objecttext + objectending
+                            im = Image.open(pfad_alt)
+
+                            im.save(pfad_neu)
+                        except:
+                            no_art.append(file)
+                    elif break_art == True:
+                        break
+
+                if break_art == False:
+                    function_sucsess()
+                else:
+                    function_error()
+
+            errstate_art = True
+
+            progressbar_art.destroy()
+            stop_art.destroy()
+            end_art = tk.Label(frame_function, font='arial 16')
+
+            if break_art == False:
+                end_art['text'] = 'Bildformatierung wurde beendet'
+                end_art['fg'] = 'lime'
+                end_art.place(y=259, relx=0.5, anchor='center')
+                if len(no_art) == 1:
+                    error_bildformat = tk.Label(frame_function, text='Folgendes Bild konnte'
+                                                                     ' nicht wie gewünscht formatiert werden', font='arial 16')
+                    error_bildformat.place(y=298, relx=0.5, anchor='center')
+                    '#width=604, height26'
+                    error2_bildformat = tk.Label(frame_function, text=no_art, font='arial 16')
+                    error2_bildformat.place(y=324, x=250)
+
+                elif len(no_art) > 1:
+                    error_bildformat = tk.Label(frame_function, text='Folgende Bilder '
+                                                                     'konnten nicht wie gewünscht formatiert werden', font='arial 16')
+                    error_bildformat.place(y=298, relx=0.5, anchor='center')
+                    '#width=604, height26'
+
+                    scrolledtext_bildformat = st.ScrolledText(frame_function, font='arial 16', width=50, height=2.5,
+                                                              bg='#F1F1F1')
+                    scrolledtext_bildformat.place(y=311, x=((600 - 458) / 2))
+                    '#width=458, height=82'
+
+                    for element in no_art:
+                        scrolledtext_bildformat.insert(tk.INSERT,  '- ' + element + '\n')
+                    scrolledtext_bildformat.configure(state='disabled')
+            elif break_art == True:
+                end_art['text'] = 'Bildformatierung wurde abgebrochen'
+                end_art['fg'] = 'red'
+                end_art.place(y=259, relx=0.5, anchor='center')
+            frame_function.update()
+            break_art = False
+
+    def gif():
+        global gif_bildformate
+        standart_art()
+        gif_bildformate.select()
+        info_art('gif')
+
+    def jpg_change():
+        global start_bildformat, break_art, no_art, errstate_art
+
+
+        start_bildformat.destroy()
+
+        if len(bildnamen) == 0:
+            bildnamen_name = tk.Label(frame_function, text=no_picture, font='arial 16', fg='red')
+            bildnamen_name.place(y=259, relx=0.5, anchor='center')
+            function_error()
+
+        else:
+
+            def breakf_art():
+                global break_art
+                break_art = True
+                function_error()
+                #button_press()
+
+            progressbar_art = ttk.Progressbar(frame_function, orient='horizontal',
+                                              length=500, mode='determinate')
+            progressbar_art.place(y=247, x=50)
+
+            stop_art = tk.Button(frame_function, text='stopp', command=lambda: breakf_art(), pady=1, padx=2, font='arial 16')
+            stop_art.place(y=275, relx=0.5, anchor='center')
+            frame_function.update()
+
+            zahl = -1
+            art_datei = '.JPEG'
+
+            if errstate_art == True:
+                pass
+
+            elif errstate_art == False:
+                button_press()
+                no_art = []
+                for datei in bildnamen:
+                    frame_function.update()
+                    if break_art == False:
+                        progressbar_art['value'] += vortschritt_pb
+                        try:
+                            zahl += 1
+                            pfad_alt = bilddateien[zahl]
+                            objecttext, objectending = os.path.splitext(datei)
+                            objectending = art_datei
+                            pfad_neu = pfad_output + objecttext + objectending
+                            im = Image.open(pfad_alt)
+                            im_new = im.convert('RGB')
+
+                            im_new.save(pfad_neu)
+                        except:
+                            no_art.append(datei)
+                    if break_art == True:
+                        break
+                if break_art == False:
+                    function_sucsess()
+                else:
+                    function_error()
+
+            errstate_art = True
+
+            progressbar_art.destroy()
+            stop_art.destroy()
+            end_art = tk.Label(frame_function, font='arial 16')
+
+            if break_art == False:
+                end_art['text'] = 'Die Bildformatierung wurde beendet'
+                end_art['fg'] = 'lime'
+                end_art.place(y=263, relx=0.5, anchor='center')
+
+                if len(no_art) == 1:
+                    error_bildformat = tk.Label(frame_function, text='Folgendes Bild konnte'
+                                                                     ' nicht wie gewünscht formatiert werden', font='arial 16')
+                    error_bildformat.place(y=298, relx=0.5, anchor='center')
+                    '#width=604, height26'
+                    error2_bildformat = tk.Label(frame_function, text=no_art, font='arial 16')
+                    error2_bildformat.place(y=324, relx=0.5, anchor='center')
+
+                elif len(no_art) > 1:
+                    error_bildformat = tk.Label(frame_function, text='Folgende Bilder konnten nicht wie gewünscht formatiert werden', font='arial 16')
+                    error_bildformat.place(y=298, relx=0.5, anchor='center')
+                    '#width=604, height26'
+
+                    scrolledtext_bildformat = st.ScrolledText(frame_function, font='arial 16', width=50, height=2.5,
+                                                              bg='#F1F1F1')
+                    scrolledtext_bildformat.place(y=311, x=((600 - 458) / 2))
+                    '#width=458, height=82'
+
+                    for element in no_art:
+                        scrolledtext_bildformat.insert(tk.INSERT, '- ' + element + '\n')
+                    scrolledtext_bildformat.configure(state='disabled')
+
+            elif break_art == True:
+                end_art['text'] = 'Die Bildformatierung wurde abgebrochen'
+                end_art['fg'] = 'red'
+                end_art.place(y=259, relx=0.5, anchor='center')
+
+            frame_function.update()
+            break_art = False
+
+
+    def jpg():
+        global jpg_bildformate
+        standart_art()
+        jpg_bildformate.select()
+
+        info_art('jpg')
+
+    def pdf_change():
+        global start_bildformat, break_art, errstate_art, no_art
+
+        def breakf_art():
+            global break_art
+            break_art = True
+            function_error()
+            #button_press()
+
+
+        start_bildformat.destroy()
+
+        if len(bildnamen) == 0:
+            bildnamen_name = tk.Label(frame_function, text=no_picture, font='arial 16', fg='red')
+            bildnamen_name.place(y=259, relx=0.5, anchor='center')
+            function_error()
+
+
+        else:
+
+            progressbar_art = ttk.Progressbar(frame_function, orient='horizontal',
+                                              length=500, mode='determinate')
+            progressbar_art.place(y=247, x=50)
+
+            stop_art = tk.Button(frame_function, text='stopp', command=lambda: breakf_art(), pady=1, padx=2)
+            stop_art.place(y=275, relx=0.5, anchor='center')
+            frame_function.update()
+
+            zahl = -1
+            art_datei = '.pdf'
+
+            if errstate_art == True:
+                pass
+
+            elif errstate_art == False:
+                button_press()
+                no_art = []
+                for datei in bildnamen:
+                    frame_function.update()
+                    if break_art == False:
+                        progressbar_art['value'] += vortschritt_pb
+                        try:
+                            zahl += 1
+                            pfad_alt = bilddateien[zahl]
+                            objecttext, objectending = os.path.splitext(datei)
+                            objectending = art_datei
+                            pfad_neu = pfad_output + objecttext + objectending
+                            im = Image.open(pfad_alt)
+                            im_new = im.convert('RGB')
+
+                            im_new.save(pfad_neu)
+                        except:
+                            no_art.append(datei)
+
+                    elif break_art == True:
+                        break
+                if break_art == False:
+                    function_sucsess()
+                else:
+                    function_error()
+            errstate_art = True
+
+            progressbar_art.destroy()
+            stop_art.destroy()
+            end_art = tk.Label(frame_function, font='arial 16')
+
+            if break_art == False:
+                end_art['text'] = 'Die Bildformatierung wurde beendet'
+                end_art['fg'] = 'lime'
+                end_art.place(y=259, relx=0.5, anchor='center')
+                if len(no_art) == 1:
+                    error_bildformat = tk.Label(frame_function, text='Folgendes Bild konnte'
+                                                                     ' nicht wie gewünscht formatiert werden', font='arial 16')
+                    error_bildformat.place(y=298, relx=0.5, anchor='center')
+                    '#width=604, height26'
+                    error2_bildformat = tk.Label(frame_function, text=no_art, font='arial 16')
+                    error2_bildformat.place(y=324, relx=0.5, anchor='center')
+
+                elif len(no_art) > 1:
+                    error_bildformat = tk.Label(frame_function, text='Folgende Bilder konnten '
+                                                                     'nicht wie gewünscht formatiert werden', font='arial 16')
+                    error_bildformat.place(y=298, relx=0.5, anchor='center')
+                    '#width=604, height26'
+
+                    scrolledtext_bildformat = st.ScrolledText(frame_function, font='arial 16', width=50, height=2.5,
+                                                              bg='#F1F1F1')
+                    scrolledtext_bildformat.place(y=311, x=((600 - 458) / 2))
+                    '#width=458, height=82'
+
+                    for element in no_art:
+                        scrolledtext_bildformat.insert(tk.INSERT,  '- ' + element + '\n')
+                    scrolledtext_bildformat.configure(state='disabled')
+            elif break_art == True:
+                end_art['text'] = 'Die Bildformatierung wurde abgebrochen'
+                end_art['fg'] = 'red'
+                end_art.place(y=259, relx=0.5, anchor='center')
+
+            frame_function.update()
+            break_art = False
+
+    def pdf():
+        global pdf_bildformate
+        standart_art()
+        pdf_bildformate.select()
+        info_art('pdf')
+
+    def standart_art(kombi=True, sound=False):
+        global gif_bildformate, pdf_bildformate, png_bildformate, jpg_bildformate, state_art, state2_art, errstate_art
+        state2_art = False
+        state_art = True
+        errstate_art = False
+        art = tk.StringVar()
+        destroy_children()
+        color_canvas()
+        canvas_art['bg'] = 'light gray'
+
+        if sound == True:
+            button_press()
+
+        if kombi == False:
+            chose_kombi['art'] = False
+
+        titel_bildformat = tk.Label(frame_function, text='Dateityp auswählen', font='arial 24 bold')
+        titel_bildformat.place(y=71, relx=0.5, anchor='center')
+        '#width=144, height=36'
+
+        text_bildformat = tk.Label(frame_function, text='Neuer Dateityp auswählen ', font='arial 16')
+        text_bildformat.place(y=120, relx=0.5, anchor='center')
+        '#width=583, height=26'
+
+        gif_bildformate = tk.Radiobutton(frame_function, text='gif', font='arial 16', command=lambda: gif(),
+                                         variable=art, value='gif', cursor='hand')
+        gif_bildformate.place(y=133, x=53)
+        '#width=45, height=24'
+
+        pdf_bildformate = tk.Radiobutton(frame_function, text='pdf', font='arial 16', command=lambda: pdf(),
+                                         variable=art, value='pdf', cursor='hand')
+        pdf_bildformate.place(y=133, x=202)
+
+        png_bildformate = tk.Radiobutton(frame_function, text='png', font='arial 16', command=lambda: png(),
+                                         variable=art, value='png', cursor='hand')
+        png_bildformate.place(y=133, x=352)
+
+        jpg_bildformate = tk.Radiobutton(frame_function, text='jpg', font='arial 16', command=lambda: jpg(),
+                                         variable=art, value='jpg', cursor='hand')
+        jpg_bildformate.place(y=133, x=502)
+
+        reload_bildformat = tk.Button(frame_function, text='neu laden', font='arial 16', command=lambda: standart_art(kombi=False, sound=True),
+                                      cursor='hand', pady=1, padx=2)
+        reload_bildformat.place(y=544, relx=0.5, anchor='center')
+        '#width=84, height=24'
+
+        help_bildformat = tk.Text(frame_help, font='arial 16')
+        help_bildformat.place(x=0, y=0, width=299, height=467)
+
+        help_bildformat.tag_configure('left', justify='left')
+
+        help_bildformat.insert(tk.END, 'Hilfefenster Bildformat\n\n', 'left')
+        help_bildformat.insert(tk.END, 'Die Funktion „Bildformat“ ändert das Dateiformat der Bilder. Zur Auswahl stehen die 4 gebräuchlichsten Dateiformate. Dieses werde durch klicken auf das gewünschte Bildformat ausgewählt.   Sollte es ein Problem mit dieser Funktion geben, den Knopf „neu laden“ drücken.  ', 'left')
+
+        help_bildformat.config(state='disabled')
+
+
+    if state_art == True:
+        global errstate_art
+        button_press()
+        standart_art()
+    else:
+        state2_art = state_art
+        errstate_art_temp = errstate_art
+        standart_art()
+        info_art(state2_art)
+        if errstate_art_temp == True:
+            errstate_art = True
+
+            if  state2_art== 'gif':
+                gif_change()
+            elif state2_art == 'pdf':
+                pdf_change()
+            elif state2_art == 'png':
+                png_change()
+            elif state2_art == 'jpg':
+                jpg_change()
+
+
+
+'#funktioniert'
+
+
+def gui_ziel(event):
+    def info_ziel(height, width, sound=None):
+        global state_ziel, start_ziel, glob_height, glob_width, act_ziel, state2_ziel
+        state2_ziel = True
+        state_ziel = False
+        if height is not None and width is not None:
+            if sound != None:
+                function_error()
+            output_ziel = tk.Label(frame_function, text='Bitte einen Wert auf 0 setzten ',
+                                   font='arial 16', fg='red')
+            output_ziel.place(y=264, relx=0.5, anchor='center')
+            '#width=411, height=26'
+
+        if height is None and width is None:
+            if sound != None:
+                function_error()
+            output_ziel = tk.Label(frame_function, text='Bitte einen gültigen Wert eingeben',
+                                   font='arial 16', fg='red')
+            output_ziel.place(y=264, relx=0.5, anchor='center')
+            '#width=411, height=26'
+
+        if height is not None and width is None:
+
+            output_ziel = tk.Label(frame_function,
+                                   text='Die neue Höhe ist:',
+                                   font='arial 16')
+            output_ziel.place(y=264, relx=0.5, anchor='center')
+            '#width=411, height=26'
+
+            auswahl_ziel = tk.Label(frame_function, text=str(height) + ' Pixel', font='arial 16')
+            auswahl_ziel.place(y=290, relx=0.5, anchor='center')
+
+            start_ziel = tk.Button(frame_function, text='start', font='arial 16',
+                                   command=lambda: ziel_groesse(height=height),
+                                   cursor='hand', pady=1, padx=2)
+            start_ziel.place(y=329, relx=0.5, anchor='center')
+
+            glob_height = height
+            glob_width = None
+            act_ziel = 'Bilder verkleinern auf eine Pixelhöhe von ' + str(glob_height)
+
+        if height is None and width is not None:
+            output_ziel = tk.Label(frame_function,
+                                   text='Die neue Breite ist: ',
+                                   font='arial 16')
+            output_ziel.place(y=264, relx=0.5, anchor='center')
+            '#width=411, height=26'
+
+            auswahl_ziel = tk.Label(frame_function, text=str(width) + ' Pixel', font='arial 16')
+            auswahl_ziel.place(y=290, relx=0.5, anchor='center')
+
+            start_ziel = tk.Button(frame_function, text='start', font='arial 16',
+                                   command=lambda: ziel_groesse(width=width),
+                                   cursor='hand', pady=1, padx=2)
+            start_ziel.place(y=329, relx=0.5, anchor='center')
+
+            glob_height = None
+            glob_width = width
+            act_ziel = 'Bilder verkleinern auf eine Pixelbreite von ' + str(glob_width)
+
+    def ziel_groesse(height=None, width=None):
+        global break_ziel, start_ziel, break_name, errstate_ziel, no_ziel
+
+        ziel_height = height
+        ziel_width = width
+
+        zahl = -1
+
+        start_ziel.destroy()
+
+        if len(bildnamen) == 0:
+            bildnamen_ziel = tk.Label(frame_function, text=no_picture, font='arial 16', fg='red')
+            bildnamen_ziel.place(y=342, relx=0.5, anchor='center')
+            function_error()
+
+        else:
+
+            def breakf_ziel():
+                global break_ziel
+                break_ziel = True
+                function_error()
+                #button_press()
+
+
+            progressbar_ziel = ttk.Progressbar(frame_function, orient='horizontal',
+                                              length=500, mode='determinate')
+            progressbar_ziel.place(y=316, x=50)
+
+
+            stop_ziel = tk.Button(frame_function, text='stopp', command=lambda: breakf_ziel(), pady=1, padx=2, font='arial 16')
+            stop_ziel.place(y=345, relx=0.5, anchor='center')
+            frame_function.update()
+
+            if errstate_ziel == True:
+                pass
+
+            elif errstate_ziel == False:
+                no_ziel = []
+                button_press()
+
+                for file in bilddateien:
+                    frame_function.update()
+                    if break_ziel == False:
+                        progressbar_ziel['value'] += vortschritt_pb
+                        zahl += 1
+                        try:
+                            im = Image.open(file)
+                            width, height = im.size
+                            if ziel_height != None:
+                                verhaeltnis_2 = ziel_height / height
+                                if verhaeltnis_2 >= 1:
+                                    pfad_neu = pfad_output + bildnamen[zahl]
+                                    new.save(pfad_neu)
+                                else:
+                                    width_new = round(verhaeltnis_2 * width)
+                                    new_size = (width_new, ziel_height)
+                                    im_new = im.resize(new_size)
+                                    pfad_neu = pfad_output + bildnamen[zahl]
+                                    im_new.save(pfad_neu)
+
+                            else:
+                                verhaeltnis_2 = ziel_width / width
+                                if verhaeltnis_2 >= 1:
+                                    pfad_neu = pfad_output + bildnamen[zahl]
+                                    im.save(pfad_neu)
+                                else:
+                                    height_new = round(verhaeltnis_2 * height)
+                                    new_size = (ziel_width, height_new)
+                                    im_new = im.resize(new_size)
+                                    pfad_neu = pfad_output + bildnamen[zahl]
+                                    im_new.save(pfad_neu)
+
+                        except:
+                            no_ziel.append(bildnamen[zahl])
+                    elif break_ziel == True:
+
+                        break
+                if break_ziel == False:
+                    function_sucsess()
+                else:
+                    function_error()
+
+            errstate_ziel = True
+            progressbar_ziel.destroy()
+            stop_ziel.destroy()
+            end_ziel = tk.Label(frame_function, font='arial 16')
+
+            if break_ziel == False:
+                end_ziel['text'] = 'Die Bildformatierung wurde beendet'
+                end_ziel['fg'] = 'lime'
+                end_ziel.place(y=329, relx=0.5, anchor='center')
+                if len(no_ziel) == 1:
+                    error_ziel = tk.Label(frame_function, text='Folgendes Bild konnte nicht wie gewünscht verkleinert werden',
+                                          font='arial 16')
+                    error_ziel.place(y=368, relx=0.5, anchor='center')
+                    '#width=604, height26'
+
+                    error2_ziel = tk.Label(frame_function, text=no_ziel, font='arial 16')
+                    error2_ziel.place(y=394, relx=0.5, anchor='center')
+                if len(no_ziel) > 1:
+                    error_ziel = tk.Label(frame_function, text='Folgende Bilder konnten nicht wie gewünscht formatiert werden', font='arial 16')
+                    error_ziel.place(y=368, relx=0.5, anchor='center')
+                    '#width=604, height26'
+
+                    scrolledtext_ziel = st.ScrolledText(frame_function, font='arial 16', width=50, height=2.5, bg='#F1F1F1')
+                    scrolledtext_ziel.place(y=381, x=((600 - 458) / 2))
+                    '#width=458, height=82'
+
+                    for element in no_ziel:
+                        scrolledtext_ziel.insert(tk.INSERT, '- ' + element + '\n')
+                    scrolledtext_ziel.configure(state='disabled')
+            elif break_ziel == True:
+                end_ziel['text'] = 'Die Bildformatierung wurde abgebrochen'
+                end_ziel['fg'] = 'red'
+                end_ziel.place(y=329, relx=0.5, anchor='center')
+
+            frame_function.update()
+            break_ziel = False
+
+    def change_ziel(event):
+        global width_ziel, height_ziel, hoehe_input, breite_input, state2_ziel
+        hoehe_input = hoehe_ziel.get()
+        breite_input = breite_ziel.get()
+        button_press()
+        standart_ziel()
+        state2_ziel = True
+        hoehe_ziel.insert(0, hoehe_input)
+        breite_ziel.insert(0, breite_input)
+        try:
+            height_ziel = int(hoehe_input)
+        except ValueError:
+            height_ziel = None
+
+        try:
+            width_ziel = int(breite_input)
+        except ValueError:
+            width_ziel = None
+
+        if height_ziel == 0:
+            height_ziel = None
+
+        if width_ziel == 0:
+            width_ziel = None
+
+        info_ziel(height_ziel, width_ziel, sound=True)
+
+    def standart_ziel(rload=None, kombi=True):
+        global hoehe_ziel, breite_ziel, state_ziel, state2_ziel, errstate_ziel
+        errstate_ziel = False
+        state2_ziel = False
+        state_ziel = True
+        destroy_children()
+
+        color_canvas()
+        canvas_ziel['bg'] = 'light gray'
+
+        if rload == False:
+            button_press()
+        if kombi == False:
+            chose_kombi['ziel'] = False
+
+        titel_ziel = tk.Label(frame_function, text='Zielgrösse bestimmen', font='arial 24 bold')
+        titel_ziel.place(y=71, relx=0.5, anchor='center')
+        '#width=144, height=36'
+
+        text_ziel = tk.Label(frame_function, text='Neue Breite eingeben', font='arial 16')
+        text_ziel.place(y=120, relx=0.5, anchor='center')
+        '#width=583, height=26'
+
+        breite_ziel = tk.Entry(frame_function, cursor='text')
+        breite_ziel.place(y=133, x=((600 - 192) / 2))
+        breite_ziel.bind('<Return>', change_ziel)
+        breite_ziel.delete(0)
+
+        '#width=192, height=30'
+
+        text2_ziel = tk.Label(frame_function, text='Neue Höhe eingeben', font='arial 16')
+        text2_ziel.place(y=191, relx=0.5, anchor='center')
+        '#width=583, height=26'
+
+        hoehe_ziel = tk.Entry(frame_function, cursor='text')
+        hoehe_ziel.place(y=204, x=((600 - 192) / 2))
+        hoehe_ziel.bind('<Return>', change_ziel)
+        hoehe_ziel.delete(0)
+        '#width=192, height=30'
+
+        reload_ziel = tk.Button(frame_function, text='neu laden', font='arial 16', command=lambda: standart_ziel(rload=False, kombi=False),
+                                cursor='hand', pady=1, padx=2)
+        reload_ziel.place(y=544, relx=0.5, anchor='center')
+        '#width=84, height=24'
+
+        help_ziel = tk.Text(frame_help, font='arial 16')
+        help_ziel.place(x=0, y=0, width=299, height=467)
+
+        help_ziel.tag_configure('left', justify='left')
+
+        help_ziel.insert(tk.END, 'Hilfefenster Zielgrösse\n\n', 'left')
+        help_ziel.insert(tk.END, 'Die Funktion „Zielgrösse“ verkleinert Bilder auf eine gewünschte Länge oder Breite. Dazu entweder die gewünschte Höhe oder Breite in Pixel in das entsprechende Eingabefeld schreiben. Die Höhe und die Breit können nicht gleichzeitig verändert werden. Als Eingabe sind nur ganze Zahlen gültig. Ist bei einem Ausgangsbild die Höhe bzw. Breite bereits kleiner als der gewünschte Wert, so die Grösse nicht verändert.   Sollte es ein Problem mit dieser Funktion geben, den Knopf „neu laden“ drücken.  ', 'left')
+
+        help_ziel.config(state='disabled')
+
+    if state_ziel == True:
+        button_press()
+        global errstate_ziel
+        standart_ziel()
+    else:
+        button_press()
+        errstate_ziel_temp = errstate_ziel
+        standart_ziel()
+        info_ziel(height_ziel, width_ziel)
+        height_str = tk.StringVar()
+        height_str.set(hoehe_input)
+        width_str = tk.StringVar()
+        width_str.set(breite_input)
+        hoehe_ziel['textvariable'] = height_str
+        breite_ziel['textvariable'] = width_str
+        if errstate_ziel_temp == True:
+            errstate_ziel = True
+            ziel_groesse()
+
+
+
+'#funktioniert'
+
+
+def gui_faktor(event):
+    def info_faktor(faktor_input, sound=None):
+        global state_faktor, start_faktor, state2_faktor, glob_faktor, act_faktor
+        state_faktor = False
+        entry_faktor.insert(0, faktor_input)
+        try:
+            faktor = float(faktor_input)
+            if faktor >= 1:
+                if sound != None:
+                    function_error()
+                output_faktor = tk.Label(frame_function, text='Der Faktor muss kleiner als 1 sein',
+                                         font='arial 16', fg='red')
+                output_faktor.place(y=193, relx=0.5, anchor='center')
+                '#width=371, height=26'
+            elif faktor <= 0:
+                if sound != None:
+                    function_error()
+                output_faktor = tk.Label(frame_function, text='Der Faktor muss grösser als 0 sein',
+                                         font='arial 16', fg='red')
+                output_faktor.place(y=193, relx=0.5, anchor='center')
+                '#width=371, height=26'
+
+            else:
+                output_faktor = tk.Label(frame_function, text='Der gewünschte Faktor ist:',
+                                         font='arial 16')
+                output_faktor.place(y=193, relx=0.5, anchor='center')
+                '#width=371, height=26'
+                auswahl_faktor = tk.Label(frame_function, text=faktor, font='arial 16')
+                auswahl_faktor.place(y=219, relx=0.5, anchor='center')
+
+                start_faktor = tk.Button(frame_function, text='start', font='arial 16',
+                                         command=lambda: change_faktor(faktor),
+                                         cursor='hand', pady=1, padx=2)
+                start_faktor.place(y=258, relx=0.5, anchor='center')
+                '#width=40, height =24'
+                state2_faktor = True
+                glob_faktor = faktor
+                act_faktor = 'Das Bild verkleinern um faktor ' + str(faktor)
+        except ValueError:
+            if sound != None:
+                function_error()
+            output_faktor = tk.Label(frame_function, text='Bitte gültigen Wert eingeben',
+                                     font='arial 16', fg='red')
+            output_faktor.place(y=193, relx=0.5, anchor='center')
+
+    def change_faktor(faktor):
+
+        global start_faktor, break_faktor, no_faktor, errstate_faktor
+        zahl = -1
+
+        def breakf_faktor():
+            global break_faktor
+            break_faktor = True
+            function_error()
+
+        start_faktor.destroy()
+
+        if len(bildnamen) == 0:
+            bildnamen_faktor = tk.Label(frame_function, text=no_picture, font='arial 16', fg='red')
+            bildnamen_faktor.place(y=258, relx=0.5, anchor='center')
+            function_error()
+
+        else:
+
+            progressbar_faktor = ttk.Progressbar(frame_function, orient='horizontal',
+                                              length=500, mode='determinate')
+            progressbar_faktor.place(y=245, x=50)
+
+            stop_faktor = tk.Button(frame_function, text='stopp', command=lambda: breakf_faktor(), pady=1, padx=2, font='arial1 16')
+            stop_faktor.place(y=274, relx=0.5, anchor='center')
+            frame_function.update()
+
+            if errstate_faktor == True:
+                pass
+
+            elif errstate_faktor == False:
+                no_faktor = []
+
+                for file in bilddateien:
+                    frame_function.update()
+                    if break_faktor == False:
+                        progressbar_faktor['value'] += vortschritt_pb
+                        zahl += 1
+                        try:
+                            im = Image.open(file)
+                            width, height = im.size
+                            width_neu = round(width * faktor)
+                            height_neu = round(height * faktor)
+                            new_size = (width_neu, height_neu)
+                            im_new = im.resize(new_size)
+                            pfad_neu = pfad_output + bildnamen[zahl]
+                            im_new.save(pfad_neu)
+                        except:
+                            no_faktor.append(bildnamen[zahl])
+                    elif break_faktor == True:
+                        break
+
+                if break_faktor == False:
+                    function_sucsess()
+                else:
+                    function_error()
+
+            errstate_faktor = True
+
+            progressbar_faktor.destroy()
+            stop_faktor.destroy()
+            end_faktor = tk.Label(frame_function, font='arial 16')
+
+            if break_faktor == False:
+                end_faktor['text'] = 'Die Bildformatierung wurde abgeschlossen'
+                end_faktor['fg'] = 'lime'
+                end_faktor.place(y=258, relx=0.5, anchor='center')
+                if len(no_faktor) == 1:
+                    error_faktor = tk.Label(frame_function, text='Folgendes Bild konnte nicht, '
+                                                                 'wie gewünscht verkleinert werden', font='arial 16')
+                    error_faktor.place(y=297, relx=0.5, anchor='center')
+                    '#width=604, height26'
+
+                    error2_faktor = tk.Label(frame_function, text=no_faktor, font='arial 16')
+                    error2_faktor.place(y=323, x=25)
+                if len(no_faktor) > 1:
+                    error_faktor = tk.Label(frame_function, text='Folgende Bilder konnten nicht, '
+                                                                 'wie gewünscht verkleinert werden', font='arial 16')
+                    error_faktor.place(y=297, relx=0.5, anchor='center')
+                    '#width=604, height26'
+
+                    scrolledtext_faktor = st.ScrolledText(frame_function, font='arial 16', width=50, height=2.5, bg='#F1F1F1')
+                    scrolledtext_faktor.place(y=310, x=((600 - 458) / 2))
+                    '#width=458, height=82'
+
+                    for element in no_faktor:
+                        scrolledtext_faktor.insert(tk.INSERT, '- ' + element + '\n')
+                    scrolledtext_faktor.configure(state='disabled')
+            elif break_faktor == True:
+                end_faktor['text'] = 'Die Bildformatierung wurde abgebrochen'
+                end_faktor['fg'] = 'red'
+                end_faktor.place(y=258, relx=0.5, anchor='center')
+            frame_function.update()
+            break_faktor = False
+
+    def check_faktor(event):
+        global faktor_input
+        faktor_input = entry_faktor.get()
+        standart_faktor()
+        info_faktor(faktor_input, sound=True)
+
+    def standart_faktor(kombi=True):
+        global entry_faktor, state_faktor, state2_faktor, errstate_faktor
+        destroy_children()
+        errstate_faktor = False
+        state_faktor = True
+        state2_faktor = False
+
+        if kombi == False:
+            chose_kombi['faktor'] = False
+
+        button_press()
+        color_canvas()
+        canvas_faktor['bg'] = 'light gray'
+
+
+        titel_faktor = tk.Label(frame_function, text='Zielfaktor bestimmen', font='arial 24 bold')
+        titel_faktor.place(y=71, relx=0.5, anchor='center')
+        '#width=119, height=36'
+
+        text_faktor = tk.Label(frame_function, text='Gewünschter Faktor eingeben', font='arial 16')
+        text_faktor.place(y=120, relx=0.5, anchor='center')
+        '#width=225, height=26'
+
+        entry_faktor = tk.Entry(frame_function, cursor='text')
+        entry_faktor.place(y=133, x=((600 - 192) / 2))
+        entry_faktor.bind('<Return>', check_faktor)
+        entry_faktor.delete(0)
+        '#width=192, height=30'
+
+        reload_faktor = tk.Button(frame_function, text='neu laden', font='arial 16', command=lambda: standart_faktor(kombi=False),
+                                  cursor='hand', pady=1, padx=2)
+        reload_faktor.place(y=544, relx=0.5, anchor='center')
+        '#width=84, height=24'
+
+        help_faktor = tk.Text(frame_help, font='arial 16')
+        help_faktor.place(x=0, y=0, width=299, height=467)
+
+        help_faktor.tag_configure('left', justify='left')
+
+        help_faktor.insert(tk.END, 'Hilfefenster Zielfaktor\n\n', 'left')
+        help_faktor.insert(tk.END, 'Die Funktion „Zielfaktor“ verkleinert die Bilder um einen gewünschten Faktor zwischen 0 und 1. Dazu den gewünschten Faktor in das Eingabefeld schreiben. Den Faktor X bitte in der Form 0.X schreiben.   Sollte es ein Problem mit dieser Funktion geben, den Knopf „neu laden“ drücken.  ', 'left')
+
+        help_faktor.config(state='disabled')
+
+    if state_faktor == True:
+        global errstate_faktor
+        standart_faktor()
+    else:
+        errstate_faktor_temp = errstate_faktor
+        standart_faktor()
+        info_faktor(faktor_input)
+        if errstate_faktor_temp == True:
+            errstate_faktor = True
+            change_faktor(None)
+
+
+'#funktioniert'
+
+
+def gui_rotation(event):
+    def info_rotation(rotation, info_sound=True):
+        global state_rotation, start_rotation, state2_rotation, glob_rotation, act_rotation, gegen_rotation, uhrzeiger_rotation, kopf_rotation
+
+        rotation_standart(sound=info_sound)
+        state_rotation = False
+
+
+        gegen_rotation['bg'] = 'white'
+        uhrzeiger_rotation['bg'] = 'white'
+        kopf_rotation['bg'] = 'white'
+
+
+
+        state2_rotation = True
+        glob_rotation = rotation
+        output_rotation = tk.Label(frame_function, text='Die ausgewählte Rotation ist: ', font='arial 16')
+        output_rotation.place(y=216, relx=0.5, anchor='center')
+        '#width=254, height=26'
+#        button_white()
+        if rotation == 'u':
+            uhrzeiger_rotation['bg'] = 'light gray'
+            act_rotation = 'Das Bild rotiert 90 Grad im Uhrzeigersinn'
+
+
+            auswahl_rotation = tk.Label(frame_function, text='90 Grad im Uhrzeigersinn', font='arial 16')
+            auswahl_rotation.place(y=242, relx=0.5, anchor='center')
+
+            start_rotation = tk.Button(frame_function, text='start', font='arial 16', command=lambda: rotation_u(sound=True),
+                                       cursor='hand', pady=1, padx=2)
+            start_rotation.place(y=281, relx=0.5, anchor='center')
+            '#width=40, height =24'
+        elif rotation == 'g':
+            gegen_rotation['bg'] ='light gray'
+            act_rotation = 'Das Bild rotiert 90 Grad im Gegenuhrzeigersinn'
+
+
+            auswahl_rotation = tk.Label(frame_function, text='90 Grad im Gegenuhrzeigersinn', font='arial 16')
+            auswahl_rotation.place(y=242, relx=0.5, anchor='center')
+
+            start_rotation = tk.Button(frame_function, text='start', font='arial 16', command=lambda: rotation_g(sound=True),
+                                       cursor='hand')
+            start_rotation.place(y=281, relx=0.5, anchor='center')
+            '#width=40, height =24'
+
+        elif rotation == '180':
+            kopf_rotation['bg'] = 'light gray'
+            act_rotation = 'Das Bild rotiert 180 Grad'
+
+            auswahl_rotation = tk.Label(frame_function, text='180 Grad', font='arial 16')
+            auswahl_rotation.place(y=242, relx=0.5, anchor='center')
+
+            start_rotation = tk.Button(frame_function, text='start', font='arial 16', command=lambda: rotation_180(sound=True),
+                                       cursor='hand')
+            start_rotation.place(y=281, relx=0.5, anchor='center')
+            '#width=40, height =24'
+
+
+    def rotation_u(sound=False):
+        global break_rotation, start_rotation, errstate_rotation, no_rotation
+        if sound == True:
+            button_press()
+
+        start_rotation.destroy()
+
+        if len(bildnamen) == 0:
+            bildnamen_rotation = tk.Label(frame_function, text=no_picture, font='arial 16', fg='red')
+            bildnamen_rotation.place(y=281, relx=0.5, anchor='center')
+            function_error()
+
+        else:
+
+            def breakf_rotation():
+                global break_rotation
+                break_rotation = True
+                function_error()
+
+            progressbar_rotation = ttk.Progressbar(frame_function, orient='horizontal',
+                                                 length=500, mode='determinate')
+            progressbar_rotation.place(y=268, x=50)
+
+            stop_rotation = tk.Button(frame_function, text='stopp', command=lambda: breakf_rotation(), pady=1, padx=2, font='arial 16')
+            stop_rotation.place(y=297, relx=0.5, anchor='center')
+            frame_function.update()
+
+            zahl = -1
+
+            if errstate_rotation == True:
+                pass
+            elif errstate_rotation == False:
+                no_rotation = []
+                for datei in bilddateien:
+                    frame_function.update()
+                    if break_rotation == False:
+                        progressbar_rotation['value'] += vortschritt_pb
+                        zahl += 1
+                        try:
+
+                            pfad_neu = pfad_output + bildnamen[zahl]
+                            bild = Image.open(datei)
+                            rotiert = bild.rotate(270, expand=1)
+                            rotiert.save(pfad_neu)
+                        except:
+                            no_rotation.append(bildnamen[zahl])
+                    elif break_rotation == True:
+                        break
+
+                if break_rotation == False:
+                    function_sucsess()
+                else:
+                    function_error()
+
+            errstate_rotation = True
+
+            progressbar_rotation.destroy()
+            stop_rotation.destroy()
+            end_rotation = tk.Label(frame_function, font='arial 16')
+
+            if break_rotation == False:
+                end_rotation['text'] = 'Die Bildformatierung wurde beendet'
+                end_rotation['fg'] ='lime'
+                end_rotation.place(y=281, relx=0.5, anchor='center')
+
+                if len(no_rotation) == 1:
+                    error_rotation = tk.Label(frame_function, text='Folgendes Bild konnte nicht wie gewünscht formatiert werden', font='arial 16')
+                    error_rotation.place(y=320, relx=0.5, anchor='center')
+                    '#width=456, height26'
+
+                    error2_rotation = tk.Label(frame_function, text=no_rotation, font='arial 16')
+                    error2_rotation.place(y=346, relx=0.5, anchor='center')
+                elif len(no_rotation) > 1:
+                    error_rotation = tk.Label(frame_function, text='Folgende Bilder konnten nicht wie gewünscht formatiert werden', font='arial 16')
+                    error_rotation.place(y=320, relx=0.5, anchor='center')
+                    '#width=456, height26'
+
+                    scrolledtext_rotation = st.ScrolledText(frame_function, font='arial 16', width=50, height=2.5, bg='#F1F1F1')
+                    scrolledtext_rotation.place(y=333, x=((600 - 458) / 2))
+                    '#width=458, height=82'
+                    for element in no_rotation:
+                        scrolledtext_rotation.insert(tk.INSERT,  '- ' + element + '\n')
+                    scrolledtext_rotation.configure(state='disabled')
+            elif break_rotation == True:
+                end_rotation['text'] = 'Die Bildformatierung wurde abgebrochen'
+                end_rotation['fg'] = 'red'
+                end_rotation.place(y=281, relx=0.5, anchor='center')
+            frame_function.update()
+            break_rotation = False
+
+    def rotation_g(sound=False):
+        global break_rotation, start_rotation, errstate_rotation, no_rotation
+        if sound == True:
+            button_press()
+
+        start_rotation.destroy()
+
+        if len(bildnamen) == 0:
+            bildnamen_rotation = tk.Label(frame_function, text=no_picture, font='arial 16', fg='red')
+
+            bildnamen_rotation.place(y=281, relx=0.5, anchor='center')
+            function_error()
+
+        else:
+
+            zahl = -1
+
+
+            def breakf_rotation():
+                global break_rotation
+                break_rotation = True
+                function_error()
+
+            progressbar_rotation = ttk.Progressbar(frame_function, orient='horizontal',
+                                                 length=500, mode='determinate')
+            progressbar_rotation.place(y=268, x=50)
+
+            stop_rotation = tk.Button(frame_function, text='stopp', command=lambda: breakf_rotation(), pady=1, padx=2, font='arial 16')
+            stop_rotation.place(y=297, relx=0.5, anchor='center')
+            frame_function.update()
+
+            if errstate_rotation == True:
+                pass
+
+            elif errstate_rotation == False:
+                no_rotation = []
+
+                for datei in bilddateien:
+                    frame_function.update()
+                    if break_rotation == False:
+                        progressbar_rotation['value'] += vortschritt_pb
+                        zahl += 1
+                        try:
+                            pfad_neu = pfad_output + bildnamen[zahl]
+                            bild = Image.open(datei)
+                            rotiert = bild.rotate(90, expand=1)
+                            rotiert.save(pfad_neu)
+                        except:
+                            no_rotation.append(bildnamen[zahl])
+                    elif break_rotation == True:
+                        break
+
+                if break_rotation == False:
+                    function_sucsess()
+                else:
+                    function_error()
+
+            errstate_rotation = True
+
+
+            progressbar_rotation.destroy()
+            stop_rotation.destroy()
+            end_rotation = tk.Label(frame_function, font='arial 16')
+
+            if break_rotation == False:
+                end_rotation['text'] = 'Die Bildformatierung wurde beendet'
+                end_rotation['fg'] = 'lime'
+                end_rotation.place(y=281, relx=0.5, anchor='center')
+                if len(no_rotation) == 1:
+                    error_rotation = tk.Label(frame_function, text='Folgendes Bild konnte'
+                                                                   ' nicht wie gewünscht formatiert werden', font='arial 16')
+                    error_rotation.place(y=320, relx=0.5, anchor='center')
+                    '#width=456, height26'
+
+                    error2_rotation = tk.Label(frame_function, text=no_rotation, font='arial 16')
+                    error2_rotation.place(y=346, relx=0.5, anchor='center')
+                elif len(no_rotation) > 1:
+                    error_rotation = tk.Label(frame_function, text='Folgende Bilder konnten nicht wie gewünscht formatiert werden', font='arial 16')
+                    error_rotation.place(y=320, relx=0.5, anchor='center')
+                    '#width=456, height26'
+
+                    scrolledtext_rotation = st.ScrolledText(frame_function, font='arial 16', width=50, height=2.5, bg='#F1F1F1')
+                    scrolledtext_rotation.place(y=333, x=((600 - 458) / 2))
+                    '#width=458, height=82'
+                    for element in no_rotation:
+                        scrolledtext_rotation.insert(tk.INSERT,  '- ' + element + '\n')
+                    scrolledtext_rotation.configure(state='disabled')
+            elif break_rotation == True:
+                end_rotation['text'] = 'Die Bildformatierung wurde abgebrochen'
+                end_rotation['fg'] = 'red'
+                end_rotation.place(y=281, relx=0.5, anchor='center')
+            frame_function.update()
+            break_rotation = False
+
+    def rotation_180(sound=False):
+        global break_rotation, start_rotation, errstate_rotation, no_rotation
+        if sound == True:
+            button_press()
+
+        start_rotation.destroy()
+
+        if len(bildnamen) == 0:
+            bildnamen_rotation = tk.Label(frame_function, text=no_picture, font='arial 16', fg='red')
+            bildnamen_rotation.place(y=281, relx=0.5, anchor='center')
+            function_error()
+
+        else:
+
+            zahl = -1
+
+
+            def breakf_rotation():
+                global break_rotation
+                break_rotation = True
+                function_error()
+
+            progressbar_rotation = ttk.Progressbar(frame_function, orient='horizontal',
+                                                 length=500, mode='determinate')
+            progressbar_rotation.place(y=268, x=50)
+
+            stop_rotation = tk.Button(frame_function, text='stopp', command=lambda: breakf_rotation(), pady=1, padx=2, font='arial 16')
+            stop_rotation.place(y=297, relx=0.5, anchor='center')
+            frame_function.update()
+
+            if errstate_rotation == True:
+                pass
+            elif errstate_rotation == False:
+                no_rotation = []
+
+
+                for datei in bilddateien:
+                    frame_function.update()
+                    if break_rotation == False:
+                        progressbar_rotation['value'] += vortschritt_pb
+                        zahl += 1
+                        try:
+                            pfad_neu = pfad_output + bildnamen[zahl]
+                            bild = Image.open(datei)
+                            rotiert = bild.rotate(180, expand=1)
+                            rotiert.save(pfad_neu)
+                        except:
+                            no_rotation.append(bildnamen[zahl])
+                    elif break_rotation == True:
+                        break
+
+                if break_rotation == False:
+                    function_sucsess()
+                else:
+                    function_error()
+
+            errstate_rotation = True
+
+            progressbar_rotation.destroy()
+            stop_rotation.destroy()
+            end_rotation = tk.Label(frame_function, font='arial 16')
+
+            if break_rotation == False:
+                end_rotation['text'] = 'Die Bildformatierung wurde beendet'
+                end_rotation['fg'] = 'lime'
+                end_rotation.place(y=281, relx=0.5, anchor='center')
+                if len(no_rotation) == 1:
+                    error_rotation = tk.Label(frame_function, text='Folgendes Bild konnte nicht wie gewünscht formatiert werden', font='arial 16')
+                    error_rotation.place(y=320, relx=0.5, anchor='center')
+                    '#width=456, height26'
+
+                    error2_rotation = tk.Label(frame_function, text=no_rotation, font='arial 16')
+                    error2_rotation.place(y=346, relx=0.5, anchor='center')
+                elif len(no_rotation) > 1:
+                    error_rotation = tk.Label(frame_function, text='Folgende Bilder konnten nicht wie gewünscht formatiert werden', font='arial 16')
+                    error_rotation.place(y=320, relx=0.5, anchor='center')
+                    '#width=456, height26'
+
+                    scrolledtext_rotation = st.ScrolledText(frame_function, font='arial 16', width=50, height=2.5, bg='#F1F1F1')
+                    scrolledtext_rotation.place(y=333, x=((600 - 458) / 2))
+                    '#width=458, height=82'
+
+                    for element in no_rotation:
+                        scrolledtext_rotation.insert(tk.INSERT,  '- ' + element + '\n')
+                    scrolledtext_rotation.configure(state='disabled')
+            elif break_rotation == True:
+                end_rotation['text'] = 'Die Bildformatierung wurde abgebrochen'
+                end_rotation['fg'] = 'red'
+                end_rotation.place(y=281, relx=0.5, anchor='center')
+            frame_function.update()
+            break_rotation = False
+
+
+    def rotation_standart(sound=True, kombi=True):
+        global state_rotation, state2_rotation, errstate_rotation, gegen_rotation, uhrzeiger_rotation, kopf_rotation
+        errstate_rotation = False
+        state2_rotation = False
+        state_rotation = True
+        destroy_children()
+        if sound == True:
+            button_press()
+
+        if kombi == False:
+            chose_kombi['rotation'] = False
+        color_canvas()
+        canvas_rotation['bg'] = 'light gray'
+
+        titel_rotation = tk.Label(frame_function, text='Rotation auswählen', font='arial 24 bold')
+        titel_rotation.place(y=71, relx=0.5, anchor='center')
+        '#width=108, height=36'
+
+        text_rotation = tk.Label(frame_function, text='Gewünschte Rotation auswählen',
+                                 font='arial 16')
+        text_rotation.place(y=120, relx=0.5, anchor='center')
+        '#width=376, height=26'
+
+        uhrzeiger_rotation = Button(frame_function, width=50, height=50, image=sy_90u,
+                                    command=lambda: info_rotation('u'),
+                                    cursor='hand')
+        uhrzeiger_rotation.place(y=136, x=88)
+
+        gegen_rotation = Button(frame_function, width=50, height=50, image=sy_90g, command=lambda: info_rotation('g'),
+                                cursor='hand')
+        gegen_rotation.place(y=136, x=488)
+
+        kopf_rotation = Button(frame_function, width=50, height=50, image=sy_180, command=lambda: info_rotation('180'),
+                               cursor='hand')
+        kopf_rotation.place(y=136, x=288)
+
+        reload_rotation = tk.Button(frame_function, text='neu laden', font='arial 16',
+                                    command=lambda: rotation_standart(kombi=False),
+                                    cursor='hand', pady=1, padx=2)
+        reload_rotation.place(y=544, relx=0.5, anchor='center')
+        '#width=84, height=24'
+
+
+        help_rotation = tk.Text(frame_help, font='arial 16')
+        help_rotation.place(x=0, y=0, width=299, height=467)
+
+        help_rotation.tag_configure('left', justify='left')
+
+        help_rotation.insert(tk.END, 'Hilfefenster Rotation\n\n', 'left')
+        help_rotation.insert(tk.END, 'Die Funktion „Rotation“ rotiert die Bilder in 90 Grad Schritten. Dazu auf die gewünschte Rotation klicken.   Sollte es ein Problem mit dieser Funktion geben, den Knopf „neu laden“ drücken.   ', 'left')
+
+        help_rotation.config(state='disabled')
+
+
+    if state_rotation == True:
+        global errstate_rotation
+        rotation_standart()
+    else:
+        errstate_rotation_temp = errstate_rotation
+        state2_rotation = state_rotation
+        rotation_standart()
+        info_rotation(glob_rotation, info_sound=False)
+        if errstate_rotation_temp == True:
+            errstate_rotation = True
+
+            if glob_rotation == 'u':
+                rotation_u()
+            elif glob_rotation == '180':
+                rotation_180()
+            elif glob_rotation == 'g':
+                rotation_g()
+
+
+
+
+
+def gui_kombi(event):
+
+    def change_kombi():
+        global break_kombi, start_kombi, errstate_kombi, no_kombi, configur_state, configur_label
+        configur_state = 'yes'
+
+        def breakf_kombi():
+            global break_kombi
+            break_kombi = True
+            function_error()
+
+        start_kombi.destroy()
+        configur_label.destroy()
+
+        if len(bildnamen) == 0:
+            bildnamen_kombi = tk.Label(frame_function, text=no_picture, font='arial 16', fg='red')
+            bildnamen_kombi.place(y=403, relx=0.5, anchor='center')
+            function_error()
+
+        else:
+
+            progressbar_kombi = ttk.Progressbar(frame_function, orient='horizontal',
+                                              length=500, mode='determinate')
+            progressbar_kombi.place(y=390, x=50)
+
+            stop_kombi = tk.Button(frame_function, text='stopp', command=lambda: breakf_kombi(), pady=1, padx=2, font='arial 16')
+            stop_kombi.place(y=419, relx=0.5, anchor='center')
+            frame_function.update()
+
+
+            nummer_name = 0
+            zahl_art = 0
+
+            if errstate_kombi == True:
+                pass
+
+            elif errstate_kombi == False:
+                start_kombi.destroy()
+
+                no_kombi = []
+                for datei in bilddateien:
+
+                    if break_kombi == False:
+                        progressbar_kombi['value'] += vortschritt_pb
+                        root.update()
+                        zahl_art += 1
+                        try:
+                            im = Image.open(datei)
+
+                            pfad_neu = pfad_output + bildnamen[zahl_art - 1]
+
+                            if chose_kombi['name'] == True:
+                                nummer_name += 1
+                                zahl_name = str(nummer_name)
+                                objecttext, objectending = os.path.splitext(datei)
+                                pfad_neu = pfad_output + glob_name + zahl_name + objectending
+
+
+                            if chose_kombi['ziel'] == True:
+                                width, height = im.size
+                                if glob_height != None:
+                                    verhaeltnis_2 = glob_height / height
+                                    if verhaeltnis_2 < 1:
+                                        width_new = round(verhaeltnis_2 * width)
+                                        new_size = (width_new, glob_height)
+                                        im = im.resize(new_size)
+                                    else:
+                                        pass
+                                else:
+                                    verhaeltnis_2 = glob_width / width
+                                    if verhaeltnis_2 < 1:
+                                        height_new = round(verhaeltnis_2 * height)
+                                        new_size = (glob_width, height_new)
+                                        im = im.resize(new_size)
+                                    else:
+                                        pass
+
+                            if chose_kombi['faktor'] == True:
+                                width, height = im.size
+                                width_neu = round(width * glob_faktor)
+                                height_neu = round(height * glob_faktor)
+                                new_size = (width_neu, height_neu)
+                                im = im.resize(new_size)
+
+                            if chose_kombi['rotation'] == True:
+
+                                if glob_rotation == 'u':
+                                    im = im.rotate(270, expand=1)
+
+                                elif glob_rotation == 'g':
+                                    im = im.rotate(90, expand=1)
+
+                                elif glob_rotation == '180':
+                                    im = im.rotate(180, expand=1)
+
+                            if chose_kombi['art'] == True:
+
+                                if chose_kombi['name'] == False:
+                                    objecttext, objectending = os.path.splitext(datei)
+                                    pfad_neu = pfad_output + objecttext + glob_art
+                                else:
+                                    objecttext, objectending = os.path.splitext(pfad_neu)
+                                    pfad_neu = objecttext + glob_art
+                                if glob_art == 'jpeg':
+                                    im = im.convert('RGB')
+                                if glob_art == 'pdf':
+                                    im = im.convert('RGB')
+
+
+                            im.save(pfad_neu)
+
+                        except:
+                            no_kombi.append(bildnamen[zahl_art - 1])
+
+                    elif break_kombi == True:
+                        break
+
+                if break_kombi == False:
+                    function_sucsess()
+                else:
+                    function_error()
+
+            errstate_kombi = True
+            progressbar_kombi.destroy()
+            stop_kombi.destroy()
+            ende_kombi = tk.Label(frame_function, font='arial 16')
+
+            if break_kombi == False:
+                ende_kombi['text'] = 'Die Bildformatierung wurde beendet'
+                ende_kombi['fg'] = 'lime'
+                ende_kombi.place(y=393, relx=0.5, anchor='center')
+                if len(no_kombi) == 1:
+                    error_kombi = tk.Label(frame_function, text='Folgendes Bild konnte nicht wie gewünscht formatiert werden', font='arial 16')
+                    error_kombi.place(y=442, relx=0.5, anchor='center')
+                    '#width=572, height26'
+
+                    error2_kombi = tk.Label(frame_function, text=no_kombi, font='arial 16')
+                    error2_kombi.place(y=468, relx=0.5, anchor='center')
+                if len(no_kombi) > 1:
+                    error_kombi = tk.Label(frame_function, text='Folgende Bilder konnten nicht wie gewünscht formatiert werden', font='arial 16')
+                    error_kombi.place(y=432, relx=0.5, anchor='center')
+                    '#width=572, height26'
+
+                    scrolledtext_kombi = st.ScrolledText(frame_function, font='arial 16', width=50, height=1,
+                                                        bg='#F1F1F1')
+                    scrolledtext_kombi.place(y=445, x=((600 - 458) / 2))
+                    '#width=458, height=82'
+
+                    for element in no_kombi:
+                        scrolledtext_kombi.insert(tk.INSERT, '- ' + element + '\n')
+                    scrolledtext_kombi.configure(state='disabled')
+                frame_function.update()
+
+            elif break_kombi == True:
+                ende_kombi['text'] = 'Die Bildformatierung wurde abgebrochen.'
+                ende_kombi['fg'] = 'red'
+                ende_kombi.place(y=416, relx=0.5, anchor='center')
+            frame_function.update()
+            break_kombi = False
+
+    def enter_kombi(key, enter_sound=True, function=None):
+        global chose_kombi, start_kombi, state_kombi, name_kombi, art_kombi, ziel_kombi, faktor_kombi, rotation_kombi, configur_state
+        liste_true = []
+
+        configur_state = 'no'
+
+        for element in chose_kombi:
+            if chose_kombi[element] == True:
+                liste_true.append(element)
+
+
+        if function != None:
+            if function == 'name':
+                pass
+
+
+
+
+
+
+
+        standart_kombi(sound=enter_sound)
+
+        if len(liste_true) > 0:
+            for key1 in liste_true:
+                chose_kombi[key1] = True
+        state_kombi = False
+        if key == 'output':
+            pass
+        elif chose_kombi[key] == False:
+            chose_kombi[key] = True
+            if key == 'ziel':
+                chose_kombi['faktor'] = False
+            elif key == 'faktor':
+                chose_kombi['ziel'] = False
+
+        else:
+            chose_kombi[key] = False
+
+
+
+
+
+        output_kombi = tk.Label(frame_function, text='Die Bilder werden zu folgendem formatiert:', font='arial 16')
+        output_kombi.place(y=271, relx=0.5, anchor='center')
+        '#width=367, height=26'
+
+        scrolledtext_kombi = st.ScrolledText(frame_function, font='arial 16', width=50, height=-10, bg='#F1F1F1')
+        scrolledtext_kombi.place(y=284, x=((600 - 458) / 2))
+        '#width=458, height=82'
+
+
+
+        zahl_loesch = 0
+        for function in chose_kombi:
+
+            if chose_kombi[str(function)] == True:
+                scrolledtext_kombi.insert(tk.INSERT, ' - ' + output_scroll_kombi[function] + '\n')
+                zahl_loesch += 1
+                if function == 'name':
+                    name_kombi['bg'] = 'light gray'
+                elif function == 'art':
+                    art_kombi['bg'] = 'light gray'
+                elif function == 'ziel':
+                    ziel_kombi['bg'] = 'light gray'
+                elif function == 'faktor':
+                    faktor_kombi['bg'] = 'light gray'
+                elif function == 'rotation':
+                    rotation_kombi['bg'] = 'light gray'
+
+
+
+
+
+
+
+        scrolledtext_kombi.configure(state='disabled')
+
+        start_kombi = tk.Button(frame_function, text='start', font='arial 16', command=lambda: change_kombi(), pady=1, padx=2)
+        start_kombi.place(y=403, relx=0.5, anchor='center')
+
+        if zahl_loesch == 0:
+            standart_kombi(sound=-False)
+
+        #if zahl_loesch == 0:
+            #output_kombi.destroy()
+            #scrolledtext_kombi.destroy()
+            #start_kombi.destroy()
+
+    def standart_kombi(sound=True):
+        global state_kombi, chose_kombi, errstate_kombi, name_kombi, art_kombi, ziel_kombi, faktor_kombi, rotation_kombi, configur_label
+        errstate_kombi = False
+
+
+        def no_config(function):
+            global configur_label, configur_state
+            if configur_state == 'yes':
+                standart_kombi()
+
+
+
+            function_error()
+
+            configur_label['text'] = 'Bei "' + function + '" eine Bildformatierung einstellen'
+            configur_state = 'no'
+
+
+
+
+        if sound == True:
+            button_press()
+
+        destroy_children()
+
+        color_canvas()
+        canvas_kombi['bg'] = 'light gray'
+
+        state_kombi = True
+
+        for element in chose_kombi:
+            chose_kombi[element] = False
+
+        configur_label = tk.Label(frame_function, font='arial 16', fg='red')
+        configur_label.place(y=239, relx=0.5, anchor='center')
+
+
+        titel_kombi = tk.Label(frame_function, text='Kombination zusammenstellen', font='arial 24 bold')
+        titel_kombi.place(y=71, relx=0.5, anchor='center')
+        '#width=76, height=36'
+
+        text_kombi = tk.Label(frame_function, text='Gewünschte Funktionen auswählen',
+                              font='arial 16')
+        text_kombi.place(y=120, relx=0.5, anchor='center')
+        '#width=538, height=26'
+
+        name_kombi = Button(frame_function, image=im_name, height=75, width=75,
+                            command=lambda: enter_kombi('name'), cursor='hand')
+        name_kombi.place(y=171, relx=0.1, anchor='center')
+        if state2_name == False:
+            name_kombi['command'] = lambda : no_config('Name')
+            name_kombi['cursor'] = 'arrow'
+            name_kombi['bg'] = 'white'
+
+#        else:
+#            name_kombi['bg'] = 'light gray'
+
+        art_kombi = Button(frame_function, image=im_art, height=75, width=75,
+                           command=lambda: enter_kombi('art'), cursor='hand')
+        art_kombi.place(y=171, relx=0.3, anchor='center')
+        if state2_art == False:
+            art_kombi['command'] = lambda : no_config('Dateityp')
+            art_kombi['bg'] = 'white'
+            art_kombi['cursor'] = 'arrow'
+
+#        else:
+#            art_kombi['bg'] = 'light gray'
+
+        ziel_kombi = Button(frame_function, image=im_ziel, height=75, width=75,
+                            command=lambda: enter_kombi('ziel'), cursor='hand')
+        ziel_kombi.place(y=171, relx=0.5, anchor='center')
+        if state2_ziel == False:
+            ziel_kombi['command'] = lambda: no_config('Zielgrösse')
+            ziel_kombi['bg'] = 'white'
+            ziel_kombi['cursor'] = 'arrow'
+
+#        else:
+#            ziel_kombi['bg'] = 'light gray'
+
+        faktor_kombi = Button(frame_function, image=im_faktor, height=75, width=75,
+                              command=lambda: enter_kombi('faktor'), cursor='hand')
+        faktor_kombi.place(y=171, relx=0.7, anchor='center')
+        if state2_faktor == False:
+            faktor_kombi['command'] = lambda: no_config('Zielfaktor')
+            faktor_kombi['bg'] = 'white'
+            faktor_kombi['cursor'] = 'arrow'
+
+#        else:
+#            faktor_kombi['bg'] = 'light gray'
+
+
+
+        rotation_kombi = Button(frame_function, image=im_rotation, height=75, width=75,
+                                command=lambda: enter_kombi('rotation'), cursor='hand')
+        rotation_kombi.place(y=171, relx=0.9, anchor='center')
+        if state2_rotation == False:
+            rotation_kombi['command'] = lambda: no_config('Rotation')
+            rotation_kombi['bg'] = 'white'
+            rotation_kombi['cursor'] = 'arrow'
+
+
+
+        reload_kombi = tk.Button(frame_function, text='neu laden', font='arial 16',
+                                 command=lambda: standart_kombi(), cursor='hand', pady=1, padx=2)
+        reload_kombi.place(y=544, relx=0.5, anchor='center')
+        '#width=84, height=24'
+
+        '#width=192, height=30'
+
+        help_name = tk.Text(frame_help, font='arial 16')
+        help_name.place(x=0, y=0, width=299, height=467)
+
+        help_name.tag_configure('center', justify='center')
+
+        help_name.insert(tk.END, 'Erläuterungen zu Komination\n\n', 'center')
+        help_name.insert(tk.END, 'Bei der Funktion „Kombination“ können alle bisherigen Funktionen zur Bildformatierung kombiniert werden. Dazu die entsprechenden Knöpfe drücken. …  Sollte es ein Problem mit dieser Funktion geben, den Knopf „neu laden“ drücken.   ', 'center')
+
+        help_name.config(state='disabled')
+
+
+
+
+
+
+
+    output_scroll_kombi = {'name': act_name, 'art': act_art, 'ziel': act_ziel, 'faktor': act_faktor,
+                           'rotation': act_rotation}
+
+    if state_kombi == True:
+        global errstate_kombi
+        standart_kombi()
+    elif state_kombi == False:
+        global chose_kombi
+        errstate_kombi_temp = errstate_kombi
+        chose_kombi_temp = chose_kombi.copy()
+        standart_kombi()
+        chose_kombi = chose_kombi_temp.copy()
+#        if state2_name != False:
+#            enter_kombi('name', enter_sound=False)
+#        elif state2_art != False:
+#            enter_kombi('art', enter_sound=False)
+#        elif state2_ziel != False:
+#            enter_kombi('ziel', enter_sound=False)
+#        elif state2_faktor != False:
+#            enter_kombi('faktor', enter_sound=False)
+#        elif state2_rotation != False:
+#            enter_kombi('rotation', enter_sound=False)
+
+        enter_kombi('output', enter_sound=False)
+        if errstate_kombi_temp == True:
+            errstate_kombi = True
+            change_kombi()
+
+
+
+
+
+
+'#grundlegende Strucktur der GUI definieren'
+
+root = tk.Tk()
+root.geometry(root_groesse)
+root.resizable(0, 0)
+root.title('Bildformatierung')
+
+frame_menu = tk.Frame(root, height=frame_height, width=100)
+frame_menu.place(x=0, y=0)
+
+frame_line1 = tk.Frame(root, bg='black', height=frame_height, width=1)
+frame_line1.place(x=100, y=0)
+
+frame_function = tk.Frame(root, height=frame_height, width=600)
+frame_function.place(x=101, y=0)
+
+frame_line2 = tk.Frame(root, bg='black', height=frame_height, width=1)
+frame_line2.place(x=700, y=0)
+
+frame_help = tk.Frame(root, height=frame_height, width=299)
+frame_help.place(x=701, y=0)
+
+'#Manubalken erstellen'
+'#Icons für Buttons laden'
+im_setting = tk.PhotoImage(file='/Users/RZN/Desktop/'
+                                'RG_schule/0_oberstufe/Maturaarbeit/Symbole/0_final/frei/neu/aktiv_einstellungen_klein.png')
+im_file = tk.PhotoImage(file='/Users/RZN/Desktop/'
+                             'RG_schule/0_oberstufe/Maturaarbeit/Symbole/0_final/frei/neu/aktiv_ordner_klein.png')
+im_name = tk.PhotoImage(file='/Users/RZN/Desktop/'
+                             'RG_schule/0_oberstufe/Maturaarbeit/Symbole/0_final/frei/neu/aktiv_name_klein.png')
+im_art = tk.PhotoImage(file='/Users/RZN/Desktop/'
+                            'RG_schule/0_oberstufe/Maturaarbeit/Symbole/0_final/frei/neu/aktiv_Dateityp_klein.png')
+im_ziel = tk.PhotoImage(file='/Users/RZN/Desktop/'
+                             'RG_schule/0_oberstufe/Maturaarbeit/Symbole/0_final/frei/neu/aktiv_Zielgrösse_klein.png')
+im_faktor = tk.PhotoImage(file='/Users/RZN/Desktop/'
+                               'RG_schule/0_oberstufe/Maturaarbeit/Symbole/0_final/frei/neu/aktiv_Zielfaktor_klein.png')
+im_rotation = tk.PhotoImage(file='/Users/RZN/Desktop/'
+                                 'RG_schule/0_oberstufe/Maturaarbeit/Symbole/0_final/frei/neu/aktiv_rotation_klein.png')
+im_kombi = tk.PhotoImage(file='/Users/RZN/Desktop/'
+                                 'RG_schule/0_oberstufe/Maturaarbeit/Symbole/0_final/frei/neu/aktiv_kombi_klein.png')
+
+
+
+sy_180 = tk.PhotoImage(file='/Users/RZN/Desktop/RG_schule/0_oberstufe/Maturaarbeit/Symbole/0_final/frei/rotation/180_klein.png')
+sy_90g = tk.PhotoImage(file='/Users/RZN/Desktop/RG_schule/0_oberstufe/Maturaarbeit/Symbole/0_final/frei/rotation/90g_klein.png')
+sy_90u = tk.PhotoImage(file='/Users/RZN/Desktop/RG_schule/0_oberstufe/Maturaarbeit/Symbole/0_final/frei/rotation/90u_klein.png')
+
+'#Buttons erstellen'
+canvas_setting = tk.Canvas(frame_menu, width=103, height=73, cursor='hand', borderwidth=0, highlightthickness=0)
+canvas_setting.place(x=-3, y=-3)
+canvas_setting.bind('<ButtonPress-1>', gui_setting)
+canvas_setting.create_image(10, 6, image=im_setting, anchor='nw')
+
+menu_line1 = tk.Frame(root, height=1, width=100, bg='black', borderwidth=0)
+menu_line1.place(x=0, y=70)
+
+canvas_file = tk.Canvas(frame_menu, width=103, height=70, cursor='hand', borderwidth=0, highlightthickness=0)
+canvas_file.place(x=-3, y=71)
+canvas_file.bind('<ButtonPress-1>', gui_file)
+canvas_file.create_image(15, 6, image=im_file, anchor='nw')
+
+menu_line2 = tk.Frame(root, height=1, width=100, bg='black')
+menu_line2.place(x=0, y=141)
+
+canvas_name = tk.Canvas(frame_menu, width=103, height=70, cursor='hand', borderwidth=0, highlightthickness=0)
+canvas_name.place(x=-3, y=142)
+canvas_name.bind('<ButtonPress-1>', gui_name)
+canvas_name.create_image(15, 6, image=im_name, anchor='nw')
+
+menu_line3 = tk.Frame(root, height=1, width=100, bg='black')
+menu_line3.place(x=0, y=212)
+
+canvas_art = tk.Canvas(frame_menu, width=103, height=70, cursor='hand', borderwidth=0, highlightthickness=0)
+canvas_art.place(x=-3, y=213)
+canvas_art.bind('<ButtonPress-1>', gui_art)
+canvas_art.create_image(15, 6, image=im_art, anchor='nw')
+
+menu_line4 = tk.Frame(root, height=1, width=100, bg='black')
+menu_line4.place(x=0, y=283)
+
+canvas_ziel = tk.Canvas(frame_menu, width=103, height=70, cursor='hand', borderwidt=0, highlightthickness=0)
+canvas_ziel.place(x=-3, y=284)
+canvas_ziel.bind('<ButtonPress-1>', gui_ziel)
+canvas_ziel.create_image(15, 6, image=im_ziel, anchor='nw')
+
+menu_line5 = tk.Frame(root, height=1, width=100, bg='black')
+menu_line5.place(x=0, y=354)
+
+canvas_faktor = tk.Canvas(frame_menu, width=103, height=70, cursor='hand', borderwidth=0, highlightthickness=0)
+canvas_faktor.place(x=-3, y=355)
+canvas_faktor.bind('<ButtonPress-1>', gui_faktor)
+canvas_faktor.create_image(15, 6, image=im_faktor, anchor='nw')
+
+menu_line6 = tk.Frame(root, height=1, width=100, bg='black')
+menu_line6.place(x=0, y=425)
+
+canvas_rotation = tk.Canvas(frame_menu, width=103, height=70, cursor='hand', borderwidth=0, highlightthickness=0)
+canvas_rotation.place(x=-3, y=426)
+canvas_rotation.bind('<ButtonPress-1>', gui_rotation)
+canvas_rotation.create_image(15, 6, image=im_rotation, anchor='nw')
+
+menu_line7 = tk.Frame(root, height=1, width=100, bg='black')
+menu_line7.place(x=0, y=496)
+
+canvas_kombi = tk.Canvas(frame_menu, width=103, height=70, cursor='hand', borderwidth=0, highlightthickness=0)
+canvas_kombi.place(x=-3, y=497)
+canvas_kombi.bind('<ButtonPress-1>', gui_kombi)
+canvas_kombi.create_image(15, 6, image=im_kombi, anchor='nw')
+
+menu_line8 = tk.Frame(root, height=1, width=100, bg='black')
+menu_line8.place(x=0, y=647)
+
+
+
+
+
+
+
+
+
+
+
+frame_menu.update()
+
+
+
+'#frame_function erstellen'
+
+gui_file('start')
+
+root.mainloop()
+
